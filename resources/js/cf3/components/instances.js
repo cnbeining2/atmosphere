@@ -1,12 +1,14 @@
 define(['react', 'components/identity_select', 'components/page_header',
     'profile', 'components/icon'], 
     function(React, IdentitySelect, PageHeader, profile, Icon) {
+
     var InstanceList = React.createClass({
         render: function() {
             var instances = this.props.instances.map(function(model) {
                 return React.DOM.li({}, 
-                    Icon({hash: model.get('image_hash')}),
-                    model.get('name'));
+                    Icon({hash: model.get('machine_alias_hash')}),
+                    model.get('name'),
+                    model.get('ip_address'));
             });
 
             return React.DOM.ul({}, instances);
@@ -44,7 +46,11 @@ define(['react', 'components/identity_select', 'components/page_header',
 
             return React.DOM.div({style: {display: this.props.visible ? 'block' : 'none'}},
                 PageHeader({title: "Instances"}),
-                IdentitySelect({identities: profile.get('identities'), onSelect: this.onSelect}),
+                IdentitySelect({
+                    identities: profile.get('identities'),
+                    onSelect: this.onSelect,
+                    selected: this.state.identity
+                }),
                 React.DOM.h2({}, "Provider " + this.state.identity.get('provider_id') + ", Identity " + this.state.identity.get('id')),
                 InstanceList({instances: instances})
             );

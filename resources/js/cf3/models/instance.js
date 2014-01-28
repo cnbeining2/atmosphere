@@ -3,60 +3,51 @@ define(['underscore', 'models/base', 'utils'], function(_, Base, Utils) {
 var Instance = Base.extend({
     
     defaults: { 'model_name': 'instance' },
-    initialize: function(attributes, options) {
-        this.set('name_or_id', this.get('name') || this.get('id'));
-        this.set('launch_relative', Utils.relative_time(this.get('launch_time')));
-    },
     parse: function(response) {
         var attributes = response;
-        
-        attributes.description = response.name;
-        attributes.id = response.alias;
-        attributes.name = response.name;
-        attributes.image_id = response.machine_alias;
-        attributes.image_name = response.machine_name;
-        attributes.image_hash = response.alias_hash;
-        //attributes.image_url = Atmo.profile.get_icon(response.machine_alias_hash);
-        attributes.type = response.size_alias;
-        attributes.launch_time = new Date(response.start_date);
-        attributes.state = response.status;
-        attributes.has_shall = response.has_shell;
-        attributes.has_vnc = response.has_vnc;
-        
-        attributes.state_is_active = (   response.status == 'active'
-                            || response.status == 'running'
-                            || response.status == 'verify_resize' );
-        attributes.state_is_build = (    response.status == 'build'
-                            || response.status == 'build - block_device_mapping'
-                              || response.status == 'build - scheduling'
-                              || response.status == 'build - spawning'
-                            || response.status == 'build - networking' 
-                            || response.status == 'active - powering-off'
-                            || response.status == 'active - image_uploading'
-                            || response.status == 'shutoff - powering-on'
-                            || response.status == 'pending'
-                            || response.status == 'suspended - resuming'
-                            || response.status == 'active - suspending'
-                            || response.status == 'resize - resize_prep'
-                            || response.status == 'resize - resize_migrating'
-                            || response.status == 'resize - resize_migrated'
-                            || response.status == 'resize - resize_finish'
-                            || response.status == 'active - networking'
-                            || response.status == 'active - deploying'
-                            || response.status == 'active - initializing'
-                            || response.status == 'hard_reboot - rebooting_hard'
-                            || response.status == 'revert_resize - resize_reverting' );
-        attributes.state_is_delete = (    response.status == 'delete'
-                              || response.status == 'active - deleting'
-                            || response.status == 'deleted'
-                            || response.status == 'shutting-down'
-                            || response.status == 'terminated' );
-        attributes.state_is_inactive = (    response.status == 'suspended'
-                            || response.status == 'shutoff');
-        attributes.private_dns_name = response.ip_address;
-        attributes.public_dns_name = response.ip_address;
-        
+        attributes.start_date = new Date(response.start_date);
         return attributes;
+    },
+    name_or_id: function() {
+        return this.get('name') || this.get('id');
+    },
+    is_active: function() {
+        var states = ['active', 'running', 'verify_resize'];
+        return _.contains(states, this.get('status'));
+    },
+    is_build: function() {
+        var states = [
+            'build',
+            'build - block_device_mapping',
+            'build - scheduling',
+            'build - spawning',
+            'build - networking' ,
+            'active - powering-off',
+            'active - image_uploading',
+            'shutoff - powering-on',
+            'pending',
+            'suspended - resuming',
+            'active - suspending',
+            'resize - resize_prep',
+            'resize - resize_migrating',
+            'resize - resize_migrated',
+            'resize - resize_finish',
+            'active - networking',
+            'active - deploying',
+            'active - initializing',
+            'hard_reboot - rebooting_hard',
+            'revert_resize - resize_reverting'
+        ];
+        return _.contains(states, this.get('status'));
+    },
+    is_delete: function() {
+        var states = ['delete', 'active - deleting', 'deleted', 'shutting-down', 
+            'terminated'];
+        return _.contains(states, this.get('status'));
+    },
+    is_inactive: function() {
+        var states = ['suspended', 'shutoff'];
+        return _.contains(states, this.get('status'));
     },
     confirm_terminate: function(options) {
         var header = "Are you sure you want to terminate this instance?";
