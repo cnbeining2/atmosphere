@@ -9,6 +9,7 @@ define(['react', 'components/page_header', 'components/common/gravatar', 'profil
                         onClick: _.partial(this.props.onClick, this.props.type),
                     },
                     Gravatar({hash: '4dada4e6ac8298336c7063ae603ea86d', type: this.props.type}),
+                    React.DOM.br(),
                     this.props.text));
         }
     });
@@ -24,7 +25,7 @@ define(['react', 'components/page_header', 'components/common/gravatar', 'profil
             this.setState({selected: icon_type});
         },
         render: function() {
-            return React.DOM.ul({}, _.map(this.props.icons, function(text, type) {
+            return React.DOM.ul({id: 'icon-set-select'}, _.map(this.props.icons, function(text, type) {
                 return IconOption({
                     type: type, 
                     text: text, 
@@ -49,6 +50,7 @@ define(['react', 'components/page_header', 'components/common/gravatar', 'profil
                 PageHeader({title: "Settings"}),
                 React.DOM.h2({}, "Notifications"),
                 React.DOM.h2({}, "Appearance"),
+                React.DOM.p({}, "Image and instance icon set:"),
                 IconSelect({icons: icons, selected: profile.get('settings')['icon_set']}));
         }
     });
