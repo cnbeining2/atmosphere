@@ -24,8 +24,8 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                     },
                     login_required: true
                 },
-                app_store: {
-                    text: 'App Store',
+                applications: {
+                    text: 'Applications',
                     icon: 'shopping-cart',
                     submenu: {
                         favorites: {

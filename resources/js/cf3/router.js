@@ -8,7 +8,7 @@ define(['backbone'], function(Backbone) {
             this.defaultRoute = options.defaultRoute;
             var base_routes = [
                 'dashboard',
-                'app_store',
+                'applications',
                 'instances',
                 'volumes',
                 'images',
