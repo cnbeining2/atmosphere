@@ -78,6 +78,10 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                 help: {
                     text: 'Help',
                     icon: 'question-sign',
+                    requires: ['components/help'],
+                    getView: function(Help) {
+                        return Help();
+                    },
                     login_required: false
                 }
             }};
