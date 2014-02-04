@@ -6,6 +6,8 @@ define(['react', 'underscore', 'components/glyphicon'], function (React, _, Glyp
             this.props.onClick(this.props.id);
         },
         render: function() {
+            var icon = this.props.icon ? Glyphicon({name: this.props.icon}) : null;
+
             return React.DOM.li(
                 {className: this.props.active ? 'active' : ''}, 
                 React.DOM.a(
@@ -13,10 +15,23 @@ define(['react', 'underscore', 'components/glyphicon'], function (React, _, Glyp
                         href: url_root + this.props.id,
                         onClick: this.handleClick
                     },
-                    Glyphicon({name: this.props.icon}), 
+                    icon,
                     this.props.text
-                )
+                ),
+                this.props.children
             );
+        }
+    });
+
+    var SidebarSubmenu = React.createClass({
+        render: function() {
+            return React.DOM.ul({}, _.map(this.props.items, function(menu_item, key) {
+                console.log(key);
+                return SidebarListItem({
+                    text: menu_item.text,
+                    active: false
+                });
+            }));
         }
     });
 
@@ -32,7 +47,7 @@ define(['react', 'underscore', 'components/glyphicon'], function (React, _, Glyp
                     onClick: this.onClick,
                     text: item.text,
                     id: id
-                });
+                }, SidebarSubmenu({items: item.submenu}));
             }.bind(this));
             return React.DOM.div({id: 'sidebar'}, React.DOM.ul({}, items));
         }

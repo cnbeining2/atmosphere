@@ -27,6 +27,14 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                 app_store: {
                     text: 'App Store',
                     icon: 'shopping-cart',
+                    submenu: {
+                        favorites: {
+                            text: 'Favorite Images'
+                        },
+                        my_images: {
+                            text: 'My Images'
+                        }
+                    },
                     login_required: false
                 },
                 instances: {
