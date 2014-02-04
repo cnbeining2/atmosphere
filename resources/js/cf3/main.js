@@ -4,7 +4,7 @@ require.config({
         /* TODO: use minified versions in production */
         'jquery': '//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery',
         'backbone': '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min',
-        'underscore': '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min',
+        'underscore': '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min',
         'google': 'https://www.google.com/jsapi',
         'bootstrap': '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min',
         'moment': '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.0/moment.min',
