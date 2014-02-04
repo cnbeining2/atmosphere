@@ -1,6 +1,11 @@
 define(['react', 'profile'], function(React, profile) {
 
     var Icon = React.createClass({
+        getDefaultProps: function() {
+            return {
+                type: profile.get('settings')['icon_set']
+            };
+        },
         propTypes: {
             hash: React.PropTypes.string
         },
@@ -24,10 +29,7 @@ define(['react', 'profile'], function(React, profile) {
             /* If a type is specified in props, use it. Otherwise, use the 
              * profile setting 
              */
-            var icon_set = this.props.type;
-            if (!icon_set)
-                icon_set = profile.get('settings')['icon_set'];
-            return React.DOM.img({src: this.getSrc(this.props.hash, icon_set)});
+            return React.DOM.img({src: this.getSrc(this.props.hash, this.props.type)});
         }
     });
 
