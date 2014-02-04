@@ -42,6 +42,7 @@ class Instance(models.Model):
     created_by_identity = models.ForeignKey(Identity, null=True)
     shell = models.BooleanField(default=False)
     vnc = models.BooleanField(default=False)
+    password = models.CharField(max_length=64, blank=True, null=True)
     start_date = models.DateTimeField() # Problems when setting a default.
     end_date = models.DateTimeField(null=True)
 
@@ -307,7 +308,8 @@ def find_instance(alias):
     return None
 
 
-def convert_esh_instance(esh_driver, esh_instance, provider_id, identity_id, user, token=None):
+def convert_esh_instance(esh_driver, esh_instance, provider_id, identity_id,
+                         user, token=None, password=None):
     """
     """
     #logger.debug(esh_instance.__dict__)
@@ -324,6 +326,8 @@ def convert_esh_instance(esh_driver, esh_instance, provider_id, identity_id, use
     core_instance = find_instance(alias)
     if core_instance:
         core_instance.ip_address = ip_address
+        if password:
+            core_instance.password = password
         core_instance.save()
     else:
         if 'launchdatetime' in esh_instance.extra:
@@ -353,7 +357,7 @@ def convert_esh_instance(esh_driver, esh_instance, provider_id, identity_id, use
         core_instance = create_instance(provider_id, identity_id, alias,
                                       coreMachine, ip_address,
                                       esh_instance.name, user,
-                                      start_date, token)
+                                      start_date, token, password)
 
     core_instance.esh = esh_instance
 
@@ -388,36 +392,9 @@ def set_instance_from_metadata(esh_driver, core_instance):
     core_instance.esh = esh_instance
     return core_instance
 
-def update_instance_metadata(esh_driver, esh_instance, data={}, replace=True):
-    """
-    NOTE: This will NOT WORK for TAGS until openstack
-    allows JSONArrays as values for metadata!
-    """
-    wait_time = 1
-    instance_id = esh_instance.id
-
-    if not hasattr(esh_driver._connection, 'ex_set_metadata'):
-        logger.warn("EshDriver %s does not have function 'ex_set_metadata'"
-                    % esh_driver._connection.__class__)
-        return {}
-    if esh_instance.extra['status'] == 'build':
-        raise Exception("Metadata cannot be applied while EshInstance %s is in"
-                        " the build state." % (esh_instance,))
-    # ASSERT: We are ready to update the metadata
-    if data.get('name'):
-        esh_driver._connection.ex_set_server_name(esh_instance, data['name'])
-    try:
-        return esh_driver._connection.ex_set_metadata(esh_instance, data,
-                replace_metadata=replace)
-    except Exception, e:
-        logger.exception("Error updating the metadata")
-        if 'incapable of performing the request' in e.message:
-            return {}
-        else:
-            raise
-
 def create_instance(provider_id, identity_id, provider_alias, provider_machine,
-                   ip_address, name, creator, create_stamp, token=None):
+                   ip_address, name, creator, create_stamp,
+                   token=None, password=None):
     #TODO: Define a creator and their identity by the METADATA instead of
     # assuming its the person who 'found' the instance
     identity = Identity.objects.get(id=identity_id)
@@ -428,10 +405,15 @@ def create_instance(provider_id, identity_id, provider_alias, provider_machine,
                                        created_by=creator,
                                        created_by_identity=identity,
                                        token=token,
+                                       password=password,
                                        shell=False,
                                        start_date=create_stamp)
     new_inst.save()
-    logger.debug("New instance created - %s<%s> (Token = %s)" %
-                 (name, provider_alias, token))
+    if token:
+        logger.debug("New instance created - %s<%s> (Token = %s)" %
+                     (name, provider_alias, token))
+    else:
+        logger.debug("New instance object - %s<%s>" %
+                     (name, provider_alias,))
     #NOTE: No instance_status_history here, because status is not passed
     return new_inst

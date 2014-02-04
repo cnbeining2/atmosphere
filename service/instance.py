@@ -1,6 +1,7 @@
 import uuid
 import time
 import os.path
+from djcelery.app import app
 
 from rtwo.provider import AWSProvider, AWSUSEastProvider,\
     AWSUSWestProvider, EucaProvider,\
@@ -18,73 +19,143 @@ from atmosphere.settings import secrets
 
 from api import get_esh_driver
 
-from service import task
 from service.quota import check_over_quota
 from service.allocation import check_over_allocation
 from service.exceptions import OverAllocationError, OverQuotaError,\
     SizeNotAvailable
 from service.accounts.openstack import AccountDriver as OSAccountDriver
-from service.tasks.driver import add_floating_ip, remove_empty_network
 
 
-def stop_instance(esh_driver, esh_instance, provider_id, identity_id, user):
+# Networking specific
+def remove_ips(esh_driver, esh_instance):
+    network_manager = esh_driver._connection.get_network_manager()
+    network_manager.disassociate_floating_ip(esh_instance.id)
+    instance_ports = network_manager.list_ports(device_id=esh_instance.id)
+    if instance_ports:
+        fixed_ips = instance_ports[0].get('fixed_ips',[])
+        if fixed_ips:
+            fixed_ip = fixed_ips[0]['ip_address']
+            esh_driver._connection.ex_remove_fixed_ip(esh_instance, fixed_ip)
+
+def remove_network(esh_driver, identity_id):
+    from service.tasks.driver import remove_empty_network
+    remove_empty_network.s(esh_driver.__class__, esh_driver.provider,
+                           esh_driver.identity, identity_id,
+                           remove_network=False).apply_async(countdown=20)
+
+
+def restore_network(esh_driver, esh_instance, identity_id):
+    core_identity = CoreIdentity.objects.get(id=identity_id)
+    (network, subnet) = network_init(core_identity)
+    return network, subnet
+
+def restore_ips(esh_driver, esh_instance):
+    from service.tasks.driver import add_floating_ip
+    node_network = esh_instance.extra.get('addresses')
+    if not node_network:
+        raise Exception("Could not determine the network for node %s"
+                        % node)
+    try:
+        network_name = node_network.keys()[0]
+    except Exception, e:
+        raise Exception("Could not determine network name for node %s"
+                        % node)
+
+    try:
+        network_manager = esh_driver._connection.get_network_manager()
+        network = network_manager.find_network(network_name)
+        if not network:
+            raise Exception("NetworkManager Could not determine the network"
+                        "for node %s" % node)
+        network_id = network[0]['id']
+    except Exception, e:
+        raise
+
+    esh_driver._connection.ex_add_fixed_ip(esh_instance, network_id)
+    add_floating_ip.s(esh_driver.__class__, esh_driver.provider,
+                      esh_driver.identity,
+                      esh_instance.id).apply_async(countdown=10)
+
+
+#Instance specific
+def stop_instance(esh_driver, esh_instance, provider_id, identity_id, user,
+                  reclaim_ip=True):
     """
 
     raise OverQuotaError, OverAllocationError, InvalidCredsError
     """
-    esh_driver.stop_instance(esh_instance)
+    if reclaim_ip:
+        remove_ips(esh_driver, esh_instance)
+    stopped = esh_driver.stop_instance(esh_instance)
+    if reclaim_ip:
+        remove_network(esh_driver, identity_id)
     update_status(esh_driver, esh_instance.id, provider_id, identity_id, user)
 
 
-def start_instance(esh_driver, esh_instance, provider_id, identity_id, user):
+def start_instance(esh_driver, esh_instance, provider_id, identity_id, user,
+                   restore_ip=True, update_meta=True):
     """
 
     raise OverQuotaError, OverAllocationError, InvalidCredsError
     """
+    from service.tasks.driver import update_metadata
+    if restore_ip:
+        restore_network(esh_driver, esh_instance, identity_id)
+    if update_meta:
+        update_instance_metadata(esh_driver, esh_instance,
+                                 data={'tmp_status': 'networking'},
+                                 replace=False)
     esh_driver.start_instance(esh_instance)
+    if restore_ip:
+        restore_ips(esh_driver, esh_instance)
+    if update_meta:
+        #Run this task only when instance moves from suspended --> active
+        update_metadata.s(
+            esh_driver.__class__, esh_driver.provider, esh_driver.identity,
+            esh_instance.id, {'tmp_status': ''}).apply_async(countdown=30)
     update_status(esh_driver, esh_instance.id, provider_id, identity_id, user)
 
 
 def suspend_instance(esh_driver, esh_instance,
                      provider_id, identity_id,
-                     user, reclaim_ip=False):
+                     user, reclaim_ip=True):
     """
 
     raise OverQuotaError, OverAllocationError, InvalidCredsError
     """
     if reclaim_ip:
-        network_manager = esh_driver._connection.get_network_manager()
-        network_manager.disassociate_floating_ip(esh_instance.id)
-        fixed_ip_port = network_manager.list_ports(device_id=esh_instance.id)
-        if fixed_ip_port:
-            network_manager.delete_port(fixed_ip_port[0])
+        remove_ips(esh_driver, esh_instance)
     suspended = esh_driver.suspend_instance(esh_instance)
     if reclaim_ip:
-        remove_empty_network.s(esh_driver.__class__, esh_driver.provider,
-                               esh_driver.identity,
-                               identity_id).apply_async(countdown=20)
+        remove_network(esh_driver, identity_id)
     update_status(esh_driver, esh_instance.id, provider_id, identity_id, user)
     return suspended
 
 
 def resume_instance(esh_driver, esh_instance,
                     provider_id, identity_id,
-                    user, restore_ip=False):
+                    user, restore_ip=True,
+                    update_meta=True):
     """
 
     raise OverQuotaError, OverAllocationError, InvalidCredsError
     """
+    from service.tasks.driver import update_metadata
     check_quota(user.username, identity_id, esh_instance.size, resuming=True)
-    core_identity = CoreIdentity.objects.get(id=identity_id)
     if restore_ip:
-        (network, subnet) = network_init(core_identity)
-        network_manager = esh_driver._connection.get_network_manager()
-        network_manager.create_port(esh_instance.id, network.id)
+        restore_network(esh_driver, esh_instance, identity_id)
+    if update_meta:
+        update_instance_metadata(esh_driver, esh_instance,
+                                 data={'tmp_status': 'networking'},
+                                 replace=False)
     esh_driver.resume_instance(esh_instance)
     if restore_ip:
-        add_floating_ip.s(esh_driver.__class__, esh_driver.provider,
-                          esh_driver.identity,
-                          esh_instance.id).apply_async(countdown=10)
+        restore_ips(esh_driver, esh_instance)
+    if update_meta:
+        #Run this task only when instance moves from suspended --> active
+        update_metadata.s(
+            esh_driver.__class__, esh_driver.provider, esh_driver.identity,
+            esh_instance.id, {'tmp_status': ''}).apply_async(countdown=30)
     update_status(esh_driver, esh_instance.id, provider_id, identity_id, user)
 
 
@@ -167,12 +238,13 @@ def launch_instance(user, provider_id, identity_id,
     check_quota(user.username, identity_id, size)
 
     #May raise InvalidCredsError
-    (esh_instance, token) = launch_esh_instance(esh_driver, machine_alias,
+    (esh_instance, token, password) = launch_esh_instance(esh_driver, machine_alias,
                                                 size_alias, core_identity,
                                                 **kwargs)
     #Convert esh --> core
     core_instance = convert_esh_instance(
-        esh_driver, esh_instance, provider_id, identity_id, user, token)
+        esh_driver, esh_instance, provider_id, identity_id,
+        user, token, password)
     core_instance.update_history(
         core_instance.esh.extra['status'],
         #2nd arg is task OR tmp_status
@@ -246,9 +318,12 @@ def launch_esh_instance(driver, machine_alias, size_alias, core_identity,
 
     return the esh_instance & instance token
     """
+    from service import task
     try:
         #create a reference to this attempted instance launch.
         instance_token = str(uuid.uuid4())
+        #create a unique one-time password for instance root user
+        instance_password = str(uuid.uuid4())
 
         #TODO: Mock these for faster launch performance
         #Gather the machine object
@@ -272,11 +347,12 @@ def launch_esh_instance(driver, machine_alias, size_alias, core_identity,
         if isinstance(driver.provider, EucaProvider):
             #Create and set userdata
             instance_service_url = "%s" % (settings.INSTANCE_SERVICE_URL,)
-            init_file_version = kwargs.get('init_file', 30)
+            init_file_version = kwargs.get('init_file', "v1")
             # Remove quotes -- Single && Double
             name = name.replace('"', '').replace("'", "")
             userdata_contents = _get_init_script(instance_service_url,
                                                  instance_token,
+                                                 instance_password,
                                                  name,
                                                  username, init_file_version)
             #Create/deploy the instance -- NOTE: Name is passed in extras
@@ -300,12 +376,11 @@ def launch_esh_instance(driver, machine_alias, size_alias, core_identity,
                                                   ex_metadata=ex_metadata,
                                                   ex_keyname=ex_keyname,
                                                   deploy=True, **kwargs)
-            #NOTE: Should be used for testing ONLY, to get around lack of
-            # celery delay/retry
-            if kwargs.get('delay'):
-                time.sleep(kwargs['delay'])
+            #Used for testing.. Eager ignores countdown
+            if app.conf.CELERY_ALWAYS_EAGER:
+                time.sleep(4*60)
             # call async task to deploy to instance.
-            task.deploy_init_task(driver, esh_instance)
+            task.deploy_init_task(driver, esh_instance, instance_password)
         elif isinstance(driver.provider, AWSProvider):
             #TODO:Extra stuff needed for AWS provider here
             esh_instance = driver.deploy_instance(name=name, image=machine,
@@ -314,14 +389,14 @@ def launch_esh_instance(driver, machine_alias, size_alias, core_identity,
                                                   **kwargs)
         else:
             raise Exception("Unable to launch with this provider.")
-        return (esh_instance, instance_token)
+        return (esh_instance, instance_token, instance_password)
     except Exception as e:
         logger.exception(e)
         raise
 
 
-def _get_init_script(instance_service_url, instance_token,
-                     instance_name, username, init_file_version):
+def _get_init_script(instance_service_url, instance_token, instance_password,
+                     instance_name, username, init_file_version="v1"):
     instance_config = """\
 arg = '{
  "atmosphere":{
@@ -331,11 +406,12 @@ arg = '{
   "token":"%s",
   "name":"%s",
   "userid":"%s",
-  "vnc_license":"%s"
+  "vnc_license":"%s",
+  "root_password":"%s"
  }
 }'""" % (instance_service_url, settings.SERVER_URL,
          instance_token, instance_name, username,
-         secrets.ATMOSPHERE_VNC_LICENSE)
+         secrets.ATMOSPHERE_VNC_LICENSE, instance_password)
 
     init_script_file = os.path.join(
         settings.PROJECT_ROOT,
@@ -344,3 +420,32 @@ arg = '{
         init_script_contents = the_file.read()
     init_script_contents += instance_config + "\nmain(arg)"
     return init_script_contents
+
+def update_instance_metadata(esh_driver, esh_instance, data={}, replace=True):
+    """
+    NOTE: This will NOT WORK for TAGS until openstack
+    allows JSONArrays as values for metadata!
+    """
+    wait_time = 1
+    instance_id = esh_instance.id
+
+    if not hasattr(esh_driver._connection, 'ex_set_metadata'):
+        logger.warn("EshDriver %s does not have function 'ex_set_metadata'"
+                    % esh_driver._connection.__class__)
+        return {}
+    if esh_instance.extra['status'] == 'build':
+        raise Exception("Metadata cannot be applied while EshInstance %s is in"
+                        " the build state." % (esh_instance,))
+    # ASSERT: We are ready to update the metadata
+    if data.get('name'):
+        esh_driver._connection.ex_set_server_name(esh_instance, data['name'])
+    try:
+        return esh_driver._connection.ex_set_metadata(esh_instance, data,
+                replace_metadata=replace)
+    except Exception, e:
+        logger.exception("Error updating the metadata")
+        if 'incapable of performing the request' in e.message:
+            return {}
+        else:
+            raise
+

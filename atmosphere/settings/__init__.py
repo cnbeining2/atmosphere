@@ -65,19 +65,19 @@ USE_TZ = True
 
 # Absolute path to the directory that holds media.
 # Example: '/home/media/media.lawrence.com/'
-# MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'resources/')
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'resources/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: 'http://media.lawrence.com', 'http://example.com/media/'
-#MEDIA_URL = '/resources/'
+MEDIA_URL = '/resources/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: 'http://foo.com/media/', '/media/'.
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static/')
 
-STATIC_URL = '/resources/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, "resources"),
@@ -89,8 +89,8 @@ SECRET_KEY = '785nc+)g%w!g01#$#lc+weg2b!yc^z#17rvjln0c5r39*vg8%t'
 # This key however should stay the same, and be shared with all Atmosphere
 ATMOSPHERE_NAMESPACE_UUID=UUID("40227dff-dedf-469c-a9f8-1953a7372ac1")
 
-# django-pipeline configuration
-PIPELINE = True
+#django-pipeline configuration
+PIPELINE = False
 
 PIPELINE_ENABLED = False
 
@@ -292,7 +292,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'check-all-instances': {
         'task': 'core.tasks.instance.test_all_instance_links', 
-        'schedule': timedelta(seconds=60*15),
+        'schedule': timedelta(seconds=60*5),
     },
 }
 CELERYD_LOG_FORMAT="[%(asctime)s: %(levelname)s/%(processName)s [PID:%(process)d] @ %(pathname)s on %(lineno)d] %(message)s"

@@ -252,8 +252,8 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 			}
 
 			// Don't permit terminate if instance is suspended
-			if (this.model.get('state_is_inactive'))
-				this.$el.find('.terminate_instance').addClass('disabled').attr('disabled', 'disabled');
+			//if (this.model.get('state_is_inactive'))
+			//	this.$el.find('.terminate_instance').addClass('disabled').attr('disabled', 'disabled');
 
 			// Show appropriate controls
 			this.$el.find('#openstack_controls').fadeIn('fast');
@@ -425,10 +425,11 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 			var currentVNC = this.$el.find('.vnc_iframe[data-ip="'+ipaddr+'"]');
 
 			if (currentVNC.length == 0) {
-				var iframe = $('<iframe>', {
-					src: 'http://' + ipaddr + ':5904',
-					'class': 'vnc_iframe'
-				}).css({height: '100%', width:  '100%'}).attr('data-ip', ipaddr);
+                var iframe = $('<a>', {href: 'http://' + ipaddr + ':5904'})
+                    .addClass('vnc_iframe')
+                    .attr('target', '_blank')
+                    .append("Launch VNC")
+                    .attr('data-ip', ipaddr);
 				this.$el.find('.instance_vnc').append(iframe);
 			} else {
 				this.$el.find('.vnc_iframe').hide();
