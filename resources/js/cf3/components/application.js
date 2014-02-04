@@ -73,6 +73,10 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                 settings: {
                     text: 'Settings',
                     icon: 'cog',
+                    requires: ['components/settings'],
+                    getView: function(Settings) {
+                        return Settings();
+                    },
                     login_required: true
                 },
                 help: {
