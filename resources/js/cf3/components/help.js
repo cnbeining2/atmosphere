@@ -40,16 +40,19 @@ define(['react', 'components/page_header'], function(React, PageHeader) {
         },
         render: function() {
             return React.DOM.form({onSubmit: this.onSubmit},
-                React.DOM.textarea({
-                    value: this.state.content, 
-                    onChange: this.handleChange}),
-                React.DOM.input({type: 'submit', value: "Send"}));
+                React.DOM.div({className: 'form-group'}, 
+                    React.DOM.textarea({
+                        className: 'form-control',
+                        rows: 5,
+                        value: this.state.content, 
+                        onChange: this.handleChange})),
+                React.DOM.div({className: 'form-group'}, 
+                    React.DOM.input({className: 'btn btn-primary', type: 'submit', value: "Send"})));
         }
     });
 
     return React.createClass({
         render: function() {
-
             return React.DOM.div({style: {display: this.props.visible ? 'block' : 'none'}},
                 PageHeader({title: "Help"}),
                 React.DOM.h2({}, "External resources"),
