@@ -1,6 +1,6 @@
 define(['react', 'components/identity_select', 'backbone', 'utils', 
-    'components/page_header', 'components/time', 'components/glyphicon',
-    'components/button_group', 'components/modal', 'models/volume',
+    'components/page_header', 'components/common/time', 'components/common/glyphicon',
+    'components/common/button_group', 'components/common/modal', 'models/volume',
     'underscore', 'profile', 'notifications'],
     function(React, IdentitySelect, Backbone, Utils, PageHeader, Time, 
         Glyphicon, ButtonGroup, Modal, Volume, _, profile, notifications) {

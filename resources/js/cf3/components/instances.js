@@ -1,12 +1,12 @@
 define(['react', 'components/identity_select', 'components/page_header',
-    'profile', 'components/icon'], 
-    function(React, IdentitySelect, PageHeader, profile, Icon) {
+    'profile', 'components/common/gravatar'], 
+    function(React, IdentitySelect, PageHeader, profile, Gravatar) {
 
     var InstanceList = React.createClass({
         render: function() {
             var instances = this.props.instances.map(function(model) {
                 return React.DOM.li({}, 
-                    Icon({hash: model.get('machine_alias_hash')}),
+                    Gravatar({hash: model.get('machine_alias_hash')}),
                     model.get('name'),
                     model.get('ip_address'));
             });

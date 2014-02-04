@@ -1,4 +1,4 @@
-define(['react', 'underscore', 'components/glyphicon'], function (React, _, Glyphicon) {
+define(['react', 'underscore', 'components/common/glyphicon'], function (React, _, Glyphicon) {
 
     var SidebarListItem = React.createClass({
         handleClick: function(e) {

@@ -1,4 +1,4 @@
-define(['react', 'components/glyphicon'], function(React, Glyphicon) {
+define(['react', 'components/common/glyphicon'], function(React, Glyphicon) {
 
     var PageHeader = React.createClass({
         render: function() {
