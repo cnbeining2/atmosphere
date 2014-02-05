@@ -37,6 +37,20 @@ define(['underscore', 'models/base', 'models/identity'], function(_, Base, Ident
                 provider_id: this.get('provider_id'),
                 identity_id: this.get('identity_id')
             };
+        },
+        set_icons: function(icon_set, options) {
+            _.defaults(options, {success: function() {}, error: function() {}});
+            this.save({ icon_set: icon_set },
+                {
+                    patch: true,
+                    async: false,
+                    success: function() {
+                        options.success();
+                    },
+                    error: function() {
+                        options.error();
+                    }
+                });
         }
     });
 

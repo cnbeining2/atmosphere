@@ -1,9 +1,9 @@
 define(['react', 'components/identity_select', 'backbone', 'utils', 
     'components/page_header', 'components/common/time', 'components/common/glyphicon',
     'components/common/button_group', 'components/common/modal', 'models/volume',
-    'underscore', 'profile', 'notifications'],
+    'underscore', 'profile'],
     function(React, IdentitySelect, Backbone, Utils, PageHeader, Time, 
-        Glyphicon, ButtonGroup, Modal, Volume, _, profile, notifications) {
+        Glyphicon, ButtonGroup, Modal, Volume, _, profile) {
 
     var VolumeListItem = React.createClass({
         render: function() {
