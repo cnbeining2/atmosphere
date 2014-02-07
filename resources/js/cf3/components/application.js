@@ -35,6 +35,10 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                             text: 'My Apps'
                         }
                     },
+                    requires: ['components/applications'],
+                    getView: function(Applications) {
+                        return Applications();
+                    },
                     login_required: false
                 },
                 instances: {
