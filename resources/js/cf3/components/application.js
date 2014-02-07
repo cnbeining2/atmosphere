@@ -25,14 +25,14 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                     login_required: true
                 },
                 applications: {
-                    text: 'Applications',
+                    text: 'Apps',
                     icon: 'shopping-cart',
                     submenu: {
                         favorites: {
-                            text: 'Favorite Images'
+                            text: 'Favorites'
                         },
-                        my_images: {
-                            text: 'My Images'
+                        my_apps: {
+                            text: 'My Apps'
                         }
                     },
                     login_required: false
@@ -54,11 +54,6 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                     getView: function(Volumes) {
                         return Volumes();
                     }
-                },
-                images: {
-                    text: 'Images',
-                    icon: 'camera',
-                    login_required: true
                 },
                 providers: {
                     text: 'Cloud Providers',
