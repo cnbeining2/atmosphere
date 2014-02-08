@@ -4,7 +4,7 @@
  * smallest supported resolution. Each larger media query builds on top of all
  * smaller ones.
  */
-@import url('cf3/structure.css');
+@import url('cf3/layout.css');
 @import url('cf3/header.css');
 @import url('cf3/sidebar.css');
 @import url('cf3/dashboard.css');
