@@ -36,6 +36,7 @@ class ApplicationSerializer(serializers.Serializer):
     created_by = serializers.SlugRelatedField(slug_field='username',
                                               source='created_by',
                                               read_only=True)
+    uuid_hash = serializers.CharField(read_only=True, source='hash_uuid')
     #Writeable Fields
     name = serializers.CharField(source='name')
     tags = serializers.CharField(source='tags.all')
