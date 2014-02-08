@@ -6,6 +6,9 @@ define(['react', 'underscore', 'components/page_header', 'collections/applicatio
                 applications: null
             };
         },
+        helpText: function() {
+            return React.DOM.p({}, "Applications are cool. You are, too. Keep bein' cool, bro.");
+        },
         render: function() {
             var content = React.DOM.div({}, "loading");
             if (this.state.applications != null)
@@ -14,7 +17,7 @@ define(['react', 'underscore', 'components/page_header', 'collections/applicatio
                 }));
 
             return React.DOM.div({},
-                PageHeader({title: 'Applications'}),
+                PageHeader({title: 'Applications', helpText: this.helpText}),
                 content);
         },
         updateApplications: function(apps) {
