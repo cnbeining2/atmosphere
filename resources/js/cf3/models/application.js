@@ -5,6 +5,7 @@ define(['underscore', 'models/base'], function(_, Base) {
         parse: function(response) {
             var attributes = response;
             attributes.id = response.uuid;
+            attributes.rating = Math.floor(Math.random() * 6);
             return attributes;
         },
         url: function(){

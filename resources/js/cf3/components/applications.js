@@ -30,7 +30,7 @@ define(['react', 'underscore', 'components/page_header',
             return React.DOM.li({}, 
                 React.DOM.div({className: 'icon-container'}, icon),
                 React.DOM.div({className: 'app-name'}, app.get('name_or_id')),
-                Rating({rating: 4}));
+                Rating({rating: app.get('rating')}));
         }
     });
 
