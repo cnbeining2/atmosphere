@@ -8,7 +8,9 @@ define(['react', 'profile'], function(React, profile) {
             };
         },
         propTypes: {
-            hash: React.PropTypes.string
+            hash: React.PropTypes.string,
+            type: React.PropTypes.string,
+            size: React.PropTypes.number
         },
         getSrc: function(hash, icon_set, size) {
             switch (icon_set) {
