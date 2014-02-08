@@ -27,14 +27,6 @@ define(['underscore', 'models/base', 'collections/instances', 'collections/volum
                 + '/provider/' + creds.provider_id 
                 + '/' + this.defaults.model_name + '/';
         },
-        /*
-         * Overriding get for caching collections
-         */
-        get: function(attr) {
-            if (typeof this[attr] == 'function')
-                return this[attr]();
-            return Backbone.Model.prototype.get.call(this, attr);
-        },
         get_collection: function(cls, key) {
             var collection = this.get(key);
             if (!collection) {

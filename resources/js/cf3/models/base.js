@@ -25,7 +25,16 @@ define(['backbone'], function(Backbone) {
             }
 
             return url;
-        }
+        },
+        /*
+         * Here, were override the get method to allow lazy-loading of computed
+         * attributes
+         */
+        get: function(attr) {
+            if (typeof this[attr] == 'function')
+                return this[attr]();
+            return Backbone.Model.prototype.get.call(this, attr);
+        },
     });
 
     return Base;

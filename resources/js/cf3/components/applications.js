@@ -13,7 +13,9 @@ define(['react', 'underscore', 'components/page_header', 'collections/applicatio
             var content = React.DOM.div({}, "loading");
             if (this.state.applications != null)
                 content = React.DOM.ul({}, this.state.applications.map(function(app) {
-                    return React.DOM.li({}, app.get('name')); 
+                    if (!app.get('name'))
+                        console.log(app);
+                    return React.DOM.li({}, app.get('name_or_id')); 
                 }));
 
             return React.DOM.div({},

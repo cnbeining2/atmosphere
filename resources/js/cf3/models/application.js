@@ -16,6 +16,9 @@ define(['underscore', 'models/base'], function(_, Base) {
             }
             
             return url;
+        },
+        name_or_id: function() {
+            return this.get('name') || this.get('id');
         }
     });
 
