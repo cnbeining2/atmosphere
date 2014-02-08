@@ -1,0 +1,32 @@
+.app-preview-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.app-preview-list li {
+    display: inline-block;
+    width: 220px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 20px 20px 0;
+}
+
+.app-preview-list li .icon-container {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.app-preview-list .app-name {
+    font-size: 17px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.star-rating {
+    font-size: 28px;
+    color: hsl(45, 85%, 50%);
+    letter-spacing: 5px;
+}
