@@ -34,6 +34,17 @@ define(['react', 'underscore', 'components/page_header',
         }
     });
 
+    var ApplicationPreviewList = React.createClass({
+        render: function() {
+            var apps = this.props.applications;
+            return React.DOM.div({},
+                React.DOM.h2({}, this.props.title),
+                React.DOM.ul({className: 'app-preview-list'}, apps.map(function(app) {
+                    return ApplicationPreview({application: app});
+                })));
+        }
+    });
+
     var ApplicationsHome = React.createClass({
         getInitialState: function() {
             return {
@@ -46,9 +57,12 @@ define(['react', 'underscore', 'components/page_header',
         render: function() {
             var content = React.DOM.div({}, "loading");
             if (this.state.applications != null)
-                content = React.DOM.ul({className: 'app-preview-list'}, this.state.applications.map(function(app) {
-                    return ApplicationPreview({application: app});
-                }));
+                content = [ApplicationPreviewList({
+                    title: "Featured Apps",
+                    applications: new Applications(this.state.applications.filter(function(app) {
+                        return app.get('featured');
+                    }))
+                })];
 
             return React.DOM.div({},
                 PageHeader({title: 'Apps', helpText: this.helpText}),
