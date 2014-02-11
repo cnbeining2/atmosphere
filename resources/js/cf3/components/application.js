@@ -26,7 +26,7 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                 },
                 images: {
                     text: 'Images',
-                    icon: 'shopping-cart',
+                    icon: 'floppy-disk',
                     submenu: {
                         favorites: {
                             text: 'Favorites'
