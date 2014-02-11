@@ -24,20 +24,20 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                     },
                     login_required: true
                 },
-                applications: {
-                    text: 'Apps',
+                images: {
+                    text: 'Images',
                     icon: 'shopping-cart',
                     submenu: {
                         favorites: {
                             text: 'Favorites'
                         },
                         my_apps: {
-                            text: 'My Apps'
+                            text: 'My Images'
                         }
                     },
-                    requires: ['components/applications'],
-                    getView: function(Applications) {
-                        return Applications();
+                    requires: ['components/images'],
+                    getView: function(Images) {
+                        return Images();
                     },
                     login_required: false
                 },

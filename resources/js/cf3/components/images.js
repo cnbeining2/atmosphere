@@ -28,7 +28,7 @@ define(['react', 'underscore', 'components/page_header',
             else
                 icon = Gravatar({hash: app.get('uuid_hash'), size: iconSize});
 
-            var imageUri = "applications/" + app.get('uuid');
+            var imageUri = "images/" + app.get('uuid');
             return React.DOM.li({}, 
                 React.DOM.div({className: 'icon-container'}, React.DOM.a({href: imageUri}, icon)),
                 React.DOM.div({className: 'app-name'}, React.DOM.a({
@@ -63,14 +63,14 @@ define(['react', 'underscore', 'components/page_header',
             var content = React.DOM.div({}, "loading");
             if (this.state.applications != null)
                 content = [ApplicationPreviewList({
-                    title: "Featured Apps",
+                    title: "Featured Images",
                     applications: new Applications(this.state.applications.filter(function(app) {
                         return app.get('featured');
                     }))
                 })];
 
             return React.DOM.div({},
-                PageHeader({title: 'Apps', helpText: this.helpText}),
+                PageHeader({title: 'Images', helpText: this.helpText}),
                 content);
         },
         updateApplications: function(apps) {
