@@ -1,30 +1,42 @@
 define(['backbone'], function(Backbone) {
     var Router = Backbone.Router.extend({
         routes: {
-            "": "handleDefaultRoute"
+            '': 'handleDefaultRoute',
+            'dashboard': 'dashboard',
+            'images': 'images',
+            'instances': 'instances',
+            'volumes': 'volumes',
+            'providers': 'providers',
+            'settings': 'settings',
+            'help': 'help'
         },
         initialize: function(options) {
             this.app = options.app;
             this.defaultRoute = options.defaultRoute;
-            var base_routes = [
-                'dashboard',
-                'applications',
-                'instances',
-                'volumes',
-                'images',
-                'providers',
-                'quotas',
-                'settings',
-                'help'
-            ];
-            var base_route = new RegExp("(" + base_routes.join("|") + ")");
-            this.route(base_route, "toggleAppView");
-        },
-        toggleAppView: function(query) {
-            this.app.handleSelect(query);
         },
         handleDefaultRoute: function() {
             this.toggleAppView(this.defaultRoute);
+        },
+        dashboard: function() {
+            this.app.handleSelect("dashboard");
+        },
+        images: function() {
+            this.app.handleSelect("images");
+        },
+        instances: function() {
+            this.app.handleSelect("instances");
+        },
+        volumes: function() {
+            this.app.handleSelect("volumes");
+        },
+        providers: function() {
+            this.app.handleSelect("providers");
+        },
+        settings: function() {
+            this.app.handleSelect("settings");
+        },
+        help: function() {
+            this.app.handleSelect("help");
         }
     });
 
