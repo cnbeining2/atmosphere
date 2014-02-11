@@ -18,7 +18,8 @@
     margin-bottom: 15px;
 }
 
-.app-preview-list .app-name {
+.app-preview-list .app-name  a {
+    display: block;
     font-size: 17px;
     white-space: nowrap;
     overflow: hidden;

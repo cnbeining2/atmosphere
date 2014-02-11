@@ -17,19 +17,24 @@ define(['react', 'underscore', 'components/page_header',
         render: function() {
             var app = this.props.application;
 
+            var iconSize = 150;
             var icon;
             if (app.get('icon'))
                 icon = React.DOM.img({
                     src: app.get('icon'),
-                    width: 150,
-                    height: 150
+                    width: iconSize,
+                    height: iconSize
                 });
             else
-                icon = Gravatar({hash: app.get('uuid_hash'), size: 150});
+                icon = Gravatar({hash: app.get('uuid_hash'), size: iconSize});
 
+            var imageUri = "applications/" + app.get('uuid');
             return React.DOM.li({}, 
-                React.DOM.div({className: 'icon-container'}, icon),
-                React.DOM.div({className: 'app-name'}, app.get('name_or_id')),
+                React.DOM.div({className: 'icon-container'}, React.DOM.a({href: imageUri}, icon)),
+                React.DOM.div({className: 'app-name'}, React.DOM.a({
+                        href: imageUri, 
+                        title: app.get('name_or_id')
+                    }, app.get('name_or_id'))),
                 Rating({rating: app.get('rating')}));
         }
     });
