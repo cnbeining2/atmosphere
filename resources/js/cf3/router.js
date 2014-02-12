@@ -13,22 +13,35 @@ define(['backbone', 'react'], function(Backbone, React) {
             'settings': 'settings',
             'help': 'help'
         },
+        setApp: function(app) {
+            this.app = app;
+        },
         setDefaultRoute: function(route) {
             this.defaultRoute = route;
         },
         handleDefaultRoute: function() {
             this.navigate(this.defaultRoute, {trigger: true, replace: true});
         },
+        setView: function(requirements, getView) {
+            this.app.setState({'loading': true}, function() {
+                require(requirements, function() {
+                    var modules = arguments;
+                    this.app.setState({'loading': false}, function() {
+                        React.renderComponent(getView.apply(this, modules),
+                            document.getElementById('content'));
+                    }.bind(this));
+                }.bind(this));
+            }.bind(this));
+        },
         dashboard: function() {
-            require(['components/dashboard'], function(Dashboard) {
-                React.renderComponent(Dashboard(),
-                    document.getElementById('main'));
+            this.setView(['components/dashboard'], function(Dashboard) {
+                return Dashboard();
             });
         },
         images: function() {
-            require(['components/images'], function(Images) {
-                React.renderComponent(Images(),
-                    document.getElementById('main'));
+            this.setView(['components/images'], function(Images) {
+                console.log(arguments);
+                return Images();
             });
         },
         imageFavorites: function() {
@@ -38,33 +51,28 @@ define(['backbone', 'react'], function(Backbone, React) {
         imageDetail: function() {
         },
         instances: function() {
-            require(['components/instances'], function(Instances) {
-                React.renderComponent(Instances(),
-                    document.getElementById('main'));
+            this.setView(['components/instances'], function(Instances) {
+                return Instances();
             });
         },
         volumes: function() {
-            require(['components/volumes'], function(Volumes) {
-                React.renderComponent(Volumes(),
-                    document.getElementById('main'));
+            this.setView(['components/volumes'], function(Volumes) {
+                return Volumes();
             });
         },
         providers: function() {
-            require(['components/providers'], function(Providers) {
-                React.renderComponent(Providers(),
-                    document.getElementById('main'));
+            this.setView(['components/providers'], function(Providers) {
+                return Providers();
             });
         },
         settings: function() {
-            require(['components/settings'], function(Settings) {
-                React.renderComponent(Settings(),
-                    document.getElementById('main'));
+            this.setView(['components/settings'], function(Settings) {
+                return Settings();
             });
         },
         help: function() {
-            require(['components/help'], function(Help) {
-                React.renderComponent(Help(),
-                    document.getElementById('main'));
+            this.setView(['components/help'], function(Help) {
+                return Help();
             });
         }
     });

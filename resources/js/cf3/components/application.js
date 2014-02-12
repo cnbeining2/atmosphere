@@ -17,7 +17,9 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
                 Header(),
                 Sidebar(),
                 Notifications(),
-                React.DOM.div({'id': 'main'}),
+                React.DOM.div({id: 'main'},
+                    React.DOM.div({className: 'loading', style: {display: this.state.loading ? 'block' : 'none'}}),
+                    React.DOM.div({id: 'content'})),
                 Footer()
             );
         }
