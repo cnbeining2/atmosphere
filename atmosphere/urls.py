@@ -91,7 +91,7 @@ urlpatterns = patterns(
 
     # Experimental UI
     # TODO: Rename to application when it launches
-    url(r'^beta/', 'web.views.app_beta'),
+    # url(r'^beta/', 'web.views.app_beta'), # remove for production.
 
     url(r'^partials/(?P<path>.*)$', 'web.views.partial'),
     url(r'^no_user/$', 'web.views.no_user_redirect'),
@@ -103,7 +103,6 @@ urlpatterns = patterns(
 
 urlpatterns += format_suffix_patterns(patterns(
     '',
-    url(r'api/v1/$', Meta.as_view()),
     url(r'api/v1/version/$', Version.as_view()),
     url(r'^api/v1/maintenance/$',
         MaintenanceRecordList.as_view(),

@@ -23,13 +23,14 @@ image_these = [
 #"emi-07092D61", "emi-F3A42505", "emi-821E2745", "emi-F1BC24FE", "emi-D0812935",
 #"emi-484D219F", "emi-D3B22F44", "emi-746826E5", "emi-BCEA2112", "emi-47BB2669",
 #"emi-CB8B2921", "emi-EA68274A", "emi-2F0222B1", "emi-77B821E5", "emi-0BEB20AD",
+"emi-009234EA", 
 ]
 def start(images):
     print 'Initializing account drivers'
     euca_accounts = EucaAccountDriver(Provider.objects.get(id=1))
     euca_img_class = euca_accounts.image_manager.__class__
     euca_img_creds = euca_accounts.image_creds
-    os_accounts = OSAccountDriver(Provider.objects.get(id=2))
+    os_accounts = OSAccountDriver(Provider.objects.get(id=4))
     os_img_class = os_accounts.image_manager.__class__
     os_img_creds = os_accounts.image_creds
     migrate_args = {

@@ -348,10 +348,11 @@ Atmo.Views.NewInstanceScreen = Backbone.View.extend({
 		//Backbone.history.navigate('#images/' + img.get('id'));
 		$('.image_list > li').removeClass('active');
 		$(e.currentTarget).addClass('active');
-
-                this.$el.find('#launchInstance').attr('disabled', this.under_quota && !this.launch_lock ? 'enabled' : 'disabled');
-                
-
+                if (this.under_quota && !this.launch_lock) {
+                    this.$el.find('#launchInstance').removeAttr('disabled');
+                } else {
+                    this.$el.find('#launchInstance').attr('disabled', true);
+                }
 		this.$el.find('#selected_image_icon_container').html('<img src="'+img.get('image_url')+'" width="50" height="50"/>');
 		this.$el.find('#selected_image_description')
 			.html(img.get('description'));
@@ -399,7 +400,7 @@ Atmo.Views.NewInstanceScreen = Backbone.View.extend({
 		e.preventDefault();
 
 		var form = this.$el.find('#image_customlaunch form')[0];
-        var image = Atmo.images.get($(form.image_id).val());
+        	var image = Atmo.images.get($(form.image_id).val());
 
 		var params = {
 		  'machine_alias': image.get('id'),
@@ -436,17 +437,25 @@ Atmo.Views.NewInstanceScreen = Backbone.View.extend({
 			instance.save(params, {
 				wait: true,
 				success: function(model) {
-					Atmo.instances.update({success: function() {
-                        self.launch_lock = false;
-						Atmo.instances.get(model.id).select();
+						Atmo.instances.update({success: function() {
+                        				self.launch_lock = false;
+							Atmo.instances.get(model.id).select();
 					}});
 					window.app.navigate('instances', {trigger: true, replace: true});
 					self.render();
-                    Atmo.Utils.notify("Instance Launched", "Your instance will be ready soon.");
+					//ANDRE ADDED CODE FOR TESTING
+					console.log("TESTING FOR PARAMS\n\n\n");
+					console.log(params);
+                    			Atmo.Utils.notify("Instance Launched", "Your instance will be ready soon.");
 				},
-				error: function() {
-					Atmo.Utils.notify("Instance launch was unsuccessful", 'If the problem persists, please email <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', { no_timeout: true });
-
+				error: function(model,xhr,options) {
+					if(xhr.status < 500){
+					   responseText = jQuery.parseJSON(xhr.responseText);
+					   Atmo.Utils.notify("Instance launch could not be completed for the following errors:", ''+ responseText.errors[0].message  + ' If the problem persists, please email <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', { no_timeout: true });
+					}
+					else{
+					   Atmo.Utils.notify("Instance launch was unsuccessful", 'If the problem persists, please email <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', { no_timeout: true });
+					}
 					// Allow user to try launching again
 					self.launch_lock = false;
 					$('#launchInstance')

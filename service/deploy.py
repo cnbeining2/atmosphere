@@ -68,7 +68,7 @@ def install_base_requirements(distro='ubuntu'):
 
 def freeze_instance(sleep_time=45):
     return ScriptDeployment(
-        "fsfreeze -f / && sleep %s && fsfreeze -u /" % sleep_time,
+        "fsfreeze -f / && sleep %s && fsfreeze -u / &" % sleep_time,
         name="./deploy_freeze_instance.sh")
 
 
@@ -129,9 +129,10 @@ def package_deps(logfile=None):
     #These requirements are for Editors, Shell-in-a-box, etc.
     do_ubuntu = "apt-get update;apt-get install -y emacs vim wget "\
                 + "language-pack-en make gcc g++ gettext texinfo "\
-                + "autoconf automake"
+                + "autoconf automake python-httplib2"
     do_centos = "yum install -y emacs vim-enhanced wget make "\
-                + "gcc gettext texinfo autoconf automake python-simplejson"
+                + "gcc gettext texinfo autoconf automake "\
+                + "python-simplejson python-httplib2"
     return LoggedScriptDeployment(
         "distro_cat=`cat /etc/*-release`\n"
         + "if [[ $distro_cat == *Ubuntu* ]]; then\n"

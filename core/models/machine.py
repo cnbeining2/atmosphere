@@ -183,7 +183,8 @@ def convert_esh_machine(esh_driver, esh_machine, provider_id, image_id=None):
     metadata = esh_machine._image.extra.get('metadata',{})
     name = esh_machine.name
     alias = esh_machine.alias
-    if metadata and has_app_data(metadata):
+
+    if metadata and False and has_app_data(metadata):
         #USE CASE: Application data exists on the image
         # and may exist on this DB
         app = get_application(alias, metadata.get('application_uuid'))
@@ -208,10 +209,10 @@ def convert_esh_machine(esh_driver, esh_machine, provider_id, image_id=None):
             app = create_application(alias, provider_id, name)
     provider_machine = load_provider_machine(alias, name, provider_id,
                                              app=app, metadata=metadata)
-    if push_metadata and hasattr(esh_driver._connection,
-                                 'ex_set_image_metadata'):
-        logger.debug("Creating App data for Image %s:%s" % (alias, app.name))
-        write_app_data(esh_driver, provider_machine)
+    #if push_metadata and hasattr(esh_driver._connection,
+    #                             'ex_set_image_metadata'):
+    #    logger.debug("Creating App data for Image %s:%s" % (alias, app.name))
+    #    write_app_data(esh_driver, provider_machine)
     provider_machine.esh = esh_machine
     return provider_machine
 
