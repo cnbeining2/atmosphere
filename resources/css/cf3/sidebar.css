@@ -62,6 +62,10 @@
     color: #ccc;
 }
 
+#sidebar ul ul li.active {
+    font-weight: bold;
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) {
     #sidebar > ul > li.active > a::before {

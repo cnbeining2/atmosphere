@@ -54,7 +54,7 @@ define(['react', 'components/page_header', 'components/common/gravatar', 'profil
 
     return React.createClass({
         render: function() {
-            return React.DOM.div({style: {display: this.props.visible ? 'block' : 'none'}},
+            return React.DOM.div({},
                 PageHeader({title: "Settings"}),
                 React.DOM.h2({}, "Notifications"),
                 React.DOM.h2({}, "Appearance"),

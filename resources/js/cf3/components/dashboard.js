@@ -34,7 +34,7 @@ define(['react', 'underscore', 'components/page_header'], function(React, _, Pag
 
     var Dashboard = React.createClass({
         render: function() {
-            return React.DOM.div({style: {display: this.props.visible ? 'block' : 'none'}},
+            return React.DOM.div({},
                 PageHeader({title: "Dashboard"}),
                 React.DOM.p({}, "Welcome to Atmosphere!"),
                 React.DOM.ul({'id': 'dashboard-link-list'}, _.map(items, DashboardIcon))

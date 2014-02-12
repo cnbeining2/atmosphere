@@ -1,9 +1,9 @@
-define(['react', 'underscore', 'components/common/glyphicon'], function (React, _, Glyphicon) {
+define(['react', 'underscore', 'components/common/glyphicon', 'router'], function (React, _, Glyphicon, router) {
 
     var SidebarListItem = React.createClass({
         handleClick: function(e) {
             e.preventDefault();
-            this.props.onClick(this.props.id);
+            router.navigate(this.props.id.join('/'), {trigger: true});
         },
         render: function() {
             var icon = this.props.icon ? Glyphicon({name: this.props.icon}) : null;
@@ -12,7 +12,7 @@ define(['react', 'underscore', 'components/common/glyphicon'], function (React, 
                 {className: this.props.active ? 'active' : ''}, 
                 React.DOM.a(
                     {
-                        href: url_root + this.props.id,
+                        href: url_root + this.props.id.join('/'),
                         onClick: this.handleClick
                     },
                     icon,
@@ -25,29 +25,107 @@ define(['react', 'underscore', 'components/common/glyphicon'], function (React, 
 
     var SidebarSubmenu = React.createClass({
         render: function() {
-            return React.DOM.ul({}, _.map(this.props.items, function(menu_item, key) {
-                console.log(key);
+            return React.DOM.ul({}, _.map(this.props.items, function(menu_item) {
                 return SidebarListItem({
                     text: menu_item.text,
-                    active: false
+                    active: this.props.active && this.props.active.join('/') == menu_item.route.join('/'), // poor man's array equality
+                    id: menu_item.route
                 });
-            }));
+            }.bind(this)));
         }
     });
 
+    var menuItems = [
+        {
+            text: 'Dashboard',
+            route: ['dashboard'],
+            icon: 'home',
+            login_required: true
+        },
+        {
+            text: 'Images',
+            route: ['images'],
+            icon: 'floppy-disk',
+            menu: [
+                {
+                    text: 'Favorites',
+                    route: ['images', 'favorites'],
+                    login_required: true
+                },
+                {
+                    text: 'My Images',
+                    route: ['images', 'authored'],
+                    login_required: true
+                }
+            ],
+            login_required: false
+        },
+        {
+            text: 'Instances',
+            route: ['instances'],
+            icon: 'cloud-download',
+            login_required: true
+        },
+        {
+            text: 'Volumes',
+            route: ['volumes'],
+            icon: 'hdd',
+            login_required: true
+        },
+        {
+            text: 'Cloud Providers',
+            route: ['providers'],
+            icon: 'cloud',
+            login_required: true
+        },
+        {
+            text: 'Settings',
+            route: ['settings'],
+            icon: 'cog',
+            login_required: true
+        },
+        {
+            text: 'Help',
+            route: ['help'],
+            icon: 'question-sign',
+            login_required: true
+        }
+    ];
+
+    //prop active route: 'images/authored' 'images/1234'
     var Sidebar = React.createClass({
-        onClick: function(clicked) {
-            this.props.onSelect(clicked);
+        getInitialState: function() {
+            return {
+                active: null
+            };
+        },
+        getDefaultProps: function() {
+            return {items: menuItems};
+        },
+        componentDidMount: function() {
+            router.on("route", function(page, bar, baz) {
+                var routeMap = {
+                    'imageDetail': ['images'],
+                    'imageFavorites': ['images', 'favorites'],
+                    'imageAuthored': ['images', 'authored']
+                };
+                if (routeMap[page])
+                    page = routeMap[page];
+                else
+                    page = [page];
+                this.setState({active: page});
+            }.bind(this));
+        },
+        componentWillUnmount: function() {
         },
         render: function() {
-            var items = _.map(this.props.items, function(item, id) {
+            var items = _.map(this.props.items, function(item) {
                 return SidebarListItem({
                     icon: item.icon, 
-                    active: id == this.props.active,
-                    onClick: this.onClick,
+                    active: this.state.active && item.route[0] == this.state.active[0],
                     text: item.text,
-                    id: id
-                }, SidebarSubmenu({items: item.submenu}));
+                    id: item.route
+                }, SidebarSubmenu({items: item.menu, active: this.state.active}));
             }.bind(this));
             return React.DOM.div({id: 'sidebar'}, React.DOM.ul({}, items));
         }

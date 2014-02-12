@@ -44,7 +44,7 @@ define(['react', 'components/identity_select', 'components/page_header',
         render: function() {
             var instances = this.state.identity.get('instances');
 
-            return React.DOM.div({style: {display: this.props.visible ? 'block' : 'none'}},
+            return React.DOM.div({},
                 PageHeader({title: "Instances"}),
                 IdentitySelect({
                     identities: profile.get('identities'),

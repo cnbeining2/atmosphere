@@ -24,14 +24,15 @@ require.config({
     }
 });
 
-require(['jquery', 'backbone', 'react', 'components/application', 'profile', 'router'], function($, Backbone, React, Application, profile, Router) {
+require(['jquery', 'backbone', 'react', 'components/application', 'profile', 'router'], function($, Backbone, React, Application, profile, router) {
 
     $(document).ready(function() {
+
+        var route = profile != null ? 'dashboard' : 'images';
+        router.setDefaultRoute(route);
+
         var app = Application();
         React.renderComponent(app, document.getElementById('application'));
-
-        var route = profile != null ? 'dashboard' : 'app_store';
-        new Router({app: app, defaultRoute: route});
         Backbone.history.start({
             pushState: true,
             root: url_root

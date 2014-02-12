@@ -193,7 +193,7 @@ define(['react', 'components/identity_select', 'backbone', 'utils',
                 
         },
         render: function() {
-            return React.DOM.div({style: {display: this.props.visible ? 'block' : 'none'}},
+            return React.DOM.div({},
                 PageHeader({title: "Volumes", helpText: this.helpText}),
                 IdentitySelect({
                     identities: profile.get('identities'), 

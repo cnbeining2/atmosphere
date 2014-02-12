@@ -1,44 +1,73 @@
-define(['backbone'], function(Backbone) {
+define(['backbone', 'react'], function(Backbone, React) {
     var Router = Backbone.Router.extend({
         routes: {
             '': 'handleDefaultRoute',
             'dashboard': 'dashboard',
             'images': 'images',
+            'images/favorites': 'imageFavorites',
+            'images/authored': 'imageAuthored',
+            'images/:id': 'imageDetail',
             'instances': 'instances',
             'volumes': 'volumes',
             'providers': 'providers',
             'settings': 'settings',
             'help': 'help'
         },
-        initialize: function(options) {
-            this.app = options.app;
-            this.defaultRoute = options.defaultRoute;
+        setDefaultRoute: function(route) {
+            this.defaultRoute = route;
         },
         handleDefaultRoute: function() {
-            this.toggleAppView(this.defaultRoute);
+            this.navigate(this.defaultRoute, {trigger: true, replace: true});
         },
         dashboard: function() {
-            this.app.handleSelect("dashboard");
+            require(['components/dashboard'], function(Dashboard) {
+                React.renderComponent(Dashboard(),
+                    document.getElementById('main'));
+            });
         },
         images: function() {
-            this.app.handleSelect("images");
+            require(['components/images'], function(Images) {
+                React.renderComponent(Images(),
+                    document.getElementById('main'));
+            });
+        },
+        imageFavorites: function() {
+        },
+        imageAuthored: function() {
+        },
+        imageDetail: function() {
         },
         instances: function() {
-            this.app.handleSelect("instances");
+            require(['components/instances'], function(Instances) {
+                React.renderComponent(Instances(),
+                    document.getElementById('main'));
+            });
         },
         volumes: function() {
-            this.app.handleSelect("volumes");
+            require(['components/volumes'], function(Volumes) {
+                React.renderComponent(Volumes(),
+                    document.getElementById('main'));
+            });
         },
         providers: function() {
-            this.app.handleSelect("providers");
+            require(['components/providers'], function(Providers) {
+                React.renderComponent(Providers(),
+                    document.getElementById('main'));
+            });
         },
         settings: function() {
-            this.app.handleSelect("settings");
+            require(['components/settings'], function(Settings) {
+                React.renderComponent(Settings(),
+                    document.getElementById('main'));
+            });
         },
         help: function() {
-            this.app.handleSelect("help");
+            require(['components/help'], function(Help) {
+                React.renderComponent(Help(),
+                    document.getElementById('main'));
+            });
         }
     });
 
-    return Router;
+    return new Router();
 });
