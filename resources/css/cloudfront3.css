@@ -33,7 +33,9 @@
     height:60px;
     width:60px;
     margin: 0 auto;
-    position:relative;
+    position: absolute;
+    left: 50%;
+    margin-left: -30px;
     -webkit-animation: rotation .6s infinite linear;
     -moz-animation: rotation .6s infinite linear;
     -o-animation: rotation .6s infinite linear;
