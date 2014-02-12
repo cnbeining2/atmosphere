@@ -74,9 +74,8 @@ define(['react', 'underscore', 'components/page_header',
                 content);
         },
         updateApplications: function(apps) {
-            console.log(this);
-            console.log(apps);
-            this.setState({applications: apps});
+            if (this.isMounted())
+                this.setState({applications: apps});
         },
         componentDidMount: function() {
             var apps = new Applications();
@@ -84,7 +83,8 @@ define(['react', 'underscore', 'components/page_header',
             apps.fetch();
         },
         componentWillUnmount: function() {
-            this.state.applications.off('sync', this.updateApplications);
+            if (this.state.applications)
+                this.state.applications.off('sync', this.updateApplications);
         }
     });
 
