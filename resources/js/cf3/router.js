@@ -13,9 +13,6 @@ define(['backbone', 'react'], function(Backbone, React) {
             'settings': 'settings',
             'help': 'help'
         },
-        setApp: function(app) {
-            this.app = app;
-        },
         setDefaultRoute: function(route) {
             this.defaultRoute = route;
         },
@@ -23,14 +20,13 @@ define(['backbone', 'react'], function(Backbone, React) {
             this.navigate(this.defaultRoute, {trigger: true, replace: true});
         },
         setView: function(requirements, getView) {
-            this.app.setState({'loading': true}, function() {
-                require(requirements, function() {
-                    var modules = arguments;
-                    this.app.setState({'loading': false}, function() {
-                        React.renderComponent(getView.apply(this, modules),
-                            document.getElementById('content'));
-                    }.bind(this));
-                }.bind(this));
+            var node = document.getElementById('main');
+            var loading = React.DOM.div({className: 'loading'});
+            React.renderComponent(loading, node);
+            require(requirements, function() {
+                var modules = arguments;
+                React.renderComponent(getView.apply(this, modules),
+                    node);
             }.bind(this));
         },
         dashboard: function() {

@@ -3,23 +3,12 @@ define(['react', 'underscore', 'components/header', 'components/sidebar',
 function (React, _, Header, Sidebar, Footer, Notifications, profile) {
 
     var Application = React.createClass({
-        getInitialState: function() {
-            return {loading: true};
-        },
         render: function() {
-            /*
-            var mainContent;
-            if (this.state.loading)
-                mainContent = React.DOM.div({className: 'loading'});
-                */
-
             return React.DOM.div({},
                 Header(),
                 Sidebar(),
                 Notifications(),
-                React.DOM.div({id: 'main'},
-                    React.DOM.div({className: 'loading', style: {display: this.state.loading ? 'block' : 'none'}}),
-                    React.DOM.div({id: 'content'})),
+                React.DOM.div({id: 'main'}),
                 Footer()
             );
         }

@@ -32,7 +32,6 @@ require(['jquery', 'backbone', 'react', 'components/application', 'profile', 'ro
 
         var route = profile != null ? 'dashboard' : 'images';
         router.setDefaultRoute(route);
-        router.setApp(app);
 
         Backbone.history.start({
             pushState: true,
