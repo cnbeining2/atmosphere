@@ -26,11 +26,12 @@ define(['react', 'underscore', 'components/common/glyphicon', 'router'], functio
     var SidebarSubmenu = React.createClass({
         render: function() {
             return React.DOM.ul({}, _.map(this.props.items, function(menu_item) {
-                return SidebarListItem({
-                    text: menu_item.text,
-                    active: this.props.active && this.props.active.join('/') == menu_item.route.join('/'), // poor man's array equality
-                    id: menu_item.route
-                });
+                if (!menu_item.login_required || this.props.loggedIn)
+                    return SidebarListItem({
+                        text: menu_item.text,
+                        active: this.props.active && this.props.active.join('/') == menu_item.route.join('/'), // poor man's array equality
+                        id: menu_item.route
+                    });
             }.bind(this)));
         }
     });
@@ -88,7 +89,7 @@ define(['react', 'underscore', 'components/common/glyphicon', 'router'], functio
             text: 'Help',
             route: ['help'],
             icon: 'question-sign',
-            login_required: true
+            login_required: false
         }
     ];
 
@@ -120,12 +121,17 @@ define(['react', 'underscore', 'components/common/glyphicon', 'router'], functio
         },
         render: function() {
             var items = _.map(this.props.items, function(item) {
-                return SidebarListItem({
-                    icon: item.icon, 
-                    active: this.state.active && item.route[0] == this.state.active[0],
-                    text: item.text,
-                    id: item.route
-                }, SidebarSubmenu({items: item.menu, active: this.state.active}));
+                if (!item.login_required || this.props.loggedIn)
+                    return SidebarListItem({
+                        icon: item.icon, 
+                        active: this.state.active && item.route[0] == this.state.active[0],
+                        text: item.text,
+                        id: item.route
+                    }, SidebarSubmenu({
+                            items: item.menu, 
+                            active: this.state.active,
+                            loggedIn: this.props.loggedIn
+                        }));
             }.bind(this));
             return React.DOM.div({id: 'sidebar'}, React.DOM.ul({}, items));
         }

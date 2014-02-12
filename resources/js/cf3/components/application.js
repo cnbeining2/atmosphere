@@ -6,7 +6,7 @@ function (React, _, Header, Sidebar, Footer, Notifications, profile) {
         render: function() {
             return React.DOM.div({},
                 Header(),
-                Sidebar(),
+                Sidebar({loggedIn: profile != null}),
                 Notifications(),
                 React.DOM.div({id: 'main'}),
                 Footer()
