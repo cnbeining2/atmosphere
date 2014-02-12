@@ -1,6 +1,6 @@
 define(['react', 'underscore', 'components/page_header', 
-    'collections/applications', 'components/common/gravatar'], 
-    function(React, _, PageHeader, Applications, Gravatar) {
+    'collections/applications', 'components/common/gravatar', 'router'],
+    function(React, _, PageHeader, Applications, Gravatar, router) {
 
     var Rating = React.createClass({
         render: function() {
@@ -14,6 +14,10 @@ define(['react', 'underscore', 'components/page_header',
     });
 
     var ApplicationPreview = React.createClass({
+        onImageClick: function(e) {
+            e.preventDefault();
+            router.navigate("images/" + this.props.application.id, {trigger: true});
+        },
         render: function() {
             var app = this.props.application;
 
@@ -29,10 +33,15 @@ define(['react', 'underscore', 'components/page_header',
                 icon = Gravatar({hash: app.get('uuid_hash'), size: iconSize});
 
             var imageUri = "images/" + app.get('uuid');
+
             return React.DOM.li({}, 
-                React.DOM.div({className: 'icon-container'}, React.DOM.a({href: imageUri}, icon)),
+                React.DOM.div({className: 'icon-container'}, React.DOM.a({
+                        href: imageUri, 
+                        onClick: this.onImageClick
+                    }, icon)),
                 React.DOM.div({className: 'app-name'}, React.DOM.a({
                         href: imageUri, 
+                        onClick: this.onImageClick,
                         title: app.get('name_or_id')
                     }, app.get('name_or_id'))),
                 Rating({rating: app.get('rating')}));
