@@ -3,7 +3,7 @@ define(['react', 'profile'], function(React, profile) {
     var Icon = React.createClass({
         getDefaultProps: function() {
             return {
-                type: profile.get('settings')['icon_set'],
+                type: profile ? profile.get('settings')['icon_set'] : 'default',
                 size: 50
             };
         },
