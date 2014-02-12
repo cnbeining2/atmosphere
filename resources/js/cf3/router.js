@@ -44,7 +44,10 @@ define(['backbone', 'react'], function(Backbone, React) {
         },
         imageAuthored: function() {
         },
-        imageDetail: function() {
+        imageDetail: function(id) {
+            this.setView(['components/image_detail'], function(ImageDetail) {
+                return ImageDetail({image_id: id});
+            });
         },
         instances: function() {
             this.setView(['components/instances'], function(Instances) {
