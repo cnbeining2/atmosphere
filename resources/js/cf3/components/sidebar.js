@@ -104,7 +104,9 @@ define(['react', 'underscore', 'components/common/glyphicon', 'router'], functio
             return {items: menuItems};
         },
         componentDidMount: function() {
-            router.on("route", function(page, bar, baz) {
+            router.on("route", function(page) {
+                if (page == "handleDefaultRoute")
+                    return;
                 var routeMap = {
                     'imageDetail': ['images'],
                     'imageFavorites': ['images', 'favorites'],
