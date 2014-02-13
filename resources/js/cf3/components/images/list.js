@@ -1,6 +1,6 @@
 define(['react', 'underscore', 'components/page_header', 
     'collections/applications', 'components/common/gravatar', 'router',
-    'components/common/rating'],
+    'components/images/rating'],
     function(React, _, PageHeader, Applications, Gravatar, router, Rating) {
 
     var Bookmark = React.createClass({

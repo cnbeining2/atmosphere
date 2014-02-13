@@ -1,5 +1,5 @@
 define(['react', 'models/application', 'collections/applications',
-    'components/common/rating'], function(React, App, AppCollection, Rating) {
+    'components/images/rating'], function(React, App, AppCollection, Rating) {
     var ImageDetail = React.createClass({
         getInitialState: function() {
             return {image: null};
