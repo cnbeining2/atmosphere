@@ -12,7 +12,7 @@ define(['react', 'components/page_header', 'collections/applications',
             return React.DOM.p({}, "Applications are cool. You are, too. Keep bein' cool, bro.");
         },
         render: function() {
-            var content = React.DOM.div({}, "loading");
+            var content = React.DOM.div({className: "loading"});
             if (this.state.applications != null)
                 content = [Cards.ApplicationCardList({
                     title: "Featured Images",
