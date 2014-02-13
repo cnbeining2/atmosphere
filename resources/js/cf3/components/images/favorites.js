@@ -9,9 +9,9 @@ define(['react', 'collections/applications', 'components/images/cards', 'compone
         },
         updateApplications: function(apps) {
             if (this.isMounted()) {
-                var favorites = apps.filter(function(model) {
+                var favorites = new Applications(apps.filter(function(model) {
                     return model.get('favorite');
-                });
+                }));
                 this.setState({applications: favorites});
             }
         },
