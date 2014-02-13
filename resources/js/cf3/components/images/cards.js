@@ -87,7 +87,7 @@ define(['react', 'components/common/gravatar', 'router'], function(React, Gravat
     });
 
     return {
-        "ImageCardList": ApplicationPreviewList,
+        "ApplicationCardList": ApplicationPreviewList,
         "Rating": Rating
     }
 

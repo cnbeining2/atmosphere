@@ -14,7 +14,7 @@ define(['react', 'components/page_header', 'collections/applications',
         render: function() {
             var content = React.DOM.div({}, "loading");
             if (this.state.applications != null)
-                content = [Cards.ImageCardList({
+                content = [Cards.ApplicationCardList({
                     title: "Featured Images",
                     applications: new Applications(this.state.applications.filter(function(app) {
                         return app.get('featured');
