@@ -27,9 +27,10 @@ define(['react', 'models/application', 'collections/applications',
             if (!app)
                 return React.DOM.div({className: 'loading'});
 
-            return React.DOM.div({}, 
+            return React.DOM.div({id: 'app-detail'}, 
                 React.DOM.h1({}, app.get('name_or_id')),
                 Cards.Rating({rating: app.get('rating')}),
+                Cards.ApplicationCard({application: app}),
                 React.DOM.h2({}, "Description"),
                 React.DOM.p({}, app.get('description')),
                 React.DOM.h2({}, "Versions of this Image"));

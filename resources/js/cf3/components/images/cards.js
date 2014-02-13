@@ -39,7 +39,13 @@ define(['react', 'components/common/gravatar', 'router'], function(React, Gravat
         }
     });
 
-    var ApplicationPreview = React.createClass({
+    var ApplicationCard = React.createClass({
+        getDefaultProps: function() {
+            return {
+                showDetails: true,
+                showLaunch: false
+            }
+        },
         onImageClick: function(e) {
             e.preventDefault();
             router.navigate("images/" + this.props.application.id, {trigger: true});
@@ -60,7 +66,7 @@ define(['react', 'components/common/gravatar', 'router'], function(React, Gravat
 
             var imageUri = url_root + "images/" + app.get('uuid');
 
-            return React.DOM.li({}, 
+            return React.DOM.div({className: 'app-card'}, 
                 React.DOM.div({className: 'icon-container'}, React.DOM.a({
                         href: imageUri, 
                         onClick: this.onImageClick
@@ -71,23 +77,27 @@ define(['react', 'components/common/gravatar', 'router'], function(React, Gravat
                         title: app.get('name_or_id')
                     }, app.get('name_or_id'))),
                 Rating({rating: app.get('rating')}),
+                React.DOM.button({
+                    className: 'btn btn-primary launch-button', 
+                    onClick: this.props.onLaunch}, "Launch"),
                 Bookmark({image: app}));
         }
     });
 
-    var ApplicationPreviewList = React.createClass({
+    var ApplicationCardList = React.createClass({
         render: function() {
             var apps = this.props.applications;
             return React.DOM.div({},
                 React.DOM.h2({}, this.props.title),
-                React.DOM.ul({className: 'app-preview-list'}, apps.map(function(app) {
-                    return ApplicationPreview({application: app});
+                React.DOM.ul({className: 'app-card-list'}, apps.map(function(app) {
+                    return React.DOM.li({}, ApplicationCard({application: app}));
                 })));
         }
     });
 
     return {
-        "ApplicationCardList": ApplicationPreviewList,
+        "ApplicationCardList": ApplicationCardList,
+        "ApplicationCard": ApplicationCard,
         "Rating": Rating
     }
 
