@@ -3,6 +3,14 @@ define(['react', 'underscore', 'components/page_header',
     'components/common/rating'],
     function(React, _, PageHeader, Applications, Gravatar, router, Rating) {
 
+    var Bookmark = React.createClass({
+        render: function() {
+            return React.DOM.div({
+                className: 'bookmark ' + (this.props.favorite ? 'on' : 'off')
+            });
+        }
+    });
+
     var ApplicationPreview = React.createClass({
         onImageClick: function(e) {
             e.preventDefault();
@@ -34,7 +42,8 @@ define(['react', 'underscore', 'components/page_header',
                         onClick: this.onImageClick,
                         title: app.get('name_or_id')
                     }, app.get('name_or_id'))),
-                Rating({rating: app.get('rating')}));
+                Rating({rating: app.get('rating')}),
+                Bookmark({favorite: app.get('favorite')}));
         }
     });
 

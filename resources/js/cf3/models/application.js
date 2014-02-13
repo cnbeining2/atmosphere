@@ -6,6 +6,7 @@ define(['underscore', 'models/base'], function(_, Base) {
             var attributes = response;
             attributes.id = response.uuid;
             attributes.rating = Math.floor(Math.random() * 6);
+            attributes.favorite = Math.random() < 0.25;
             return attributes;
         },
         url: function(){
