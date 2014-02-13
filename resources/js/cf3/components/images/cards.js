@@ -78,7 +78,7 @@ define(['react', 'components/common/gravatar', 'router'], function(React, Gravat
                     }, app.get('name_or_id'))),
                 Rating({rating: app.get('rating')}),
                 React.DOM.button({
-                    className: 'btn btn-primary launch-button', 
+                    className: 'btn btn-primary btn-block launch-button', 
                     onClick: this.props.onLaunch}, "Launch"),
                 Bookmark({image: app}));
         }
