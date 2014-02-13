@@ -1,5 +1,7 @@
 define(['react', 'models/application', 'collections/applications',
-    'components/images/rating'], function(React, App, AppCollection, Rating) {
+    'components/images/cards'], 
+    function(React, App, AppCollection, Cards) {
+
     var ImageDetail = React.createClass({
         getInitialState: function() {
             return {image: null};
@@ -28,7 +30,7 @@ define(['react', 'models/application', 'collections/applications',
 
             return React.DOM.div({}, 
                 React.DOM.h1({}, image.get('name_or_id')),
-                Rating({rating: image.get('rating')}),
+                Cards.Rating({rating: image.get('rating')}),
                 React.DOM.h2({}, "Description"),
                 React.DOM.p({}, image.get('description')),
                 React.DOM.h2({}, "Versions of this Image"));
