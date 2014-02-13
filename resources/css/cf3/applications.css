@@ -54,6 +54,7 @@
     letter-spacing: 5px;
 }
 
+/* Bookmarks */
 .bookmark {
     width: 0px;
     height: 40px;
@@ -66,10 +67,23 @@
 }
 
 .bookmark.off {
-    border-right: 20px solid hsl(0, 0%, 75%);
-    border-left: 20px solid hsl(0, 0%, 75%);
+    border-right: 20px solid hsl(0, 0%, 35%);
+    border-left: 20px solid hsl(0, 0%, 35%);
     border-bottom: 15px solid transparent;
 }
+
+.bookmark.off::after {
+    content: "";
+    height: 49px;
+    position: absolute;
+    top: 2px;
+    left: -18px;
+    border-radius: 3px;
+    border-right: 18px solid #fff;
+    border-left: 18px solid #fff;
+    border-bottom: 14px solid transparent;
+}
+
 
 .bookmark.on {
     border-right: 20px solid hsl(0, 100%, 25%);
