@@ -36,11 +36,13 @@ define(['backbone', 'react'], function(Backbone, React) {
         },
         images: function() {
             this.setView(['components/images/list'], function(Images) {
-                console.log(arguments);
                 return Images();
             });
         },
         imageFavorites: function() {
+            this.setView(['components/images/favorites'], function(Favorites) {
+                return Favorites();
+            });
         },
         imageAuthored: function() {
         },
