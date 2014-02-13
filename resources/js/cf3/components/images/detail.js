@@ -2,9 +2,9 @@ define(['react', 'models/application', 'collections/applications',
     'components/images/cards'], 
     function(React, App, AppCollection, Cards) {
 
-    var ImageDetail = React.createClass({
+    var ApplicationDetail = React.createClass({
         getInitialState: function() {
-            return {image: null};
+            return {application: null};
         },
         componentDidMount: function() {
             // TODO: This is what should happen if we have API support for it
@@ -18,24 +18,23 @@ define(['react', 'models/application', 'collections/applications',
             var apps = new AppCollection();
             apps.fetch({success: function(collection) {
                 var app = collection.get(this.props.image_id);
-                this.setState({image: app});
+                this.setState({application: app});
             }.bind(this)});
         },
         render: function() {
-            var image = this.state.image;
-            console.log(image);
+            var app = this.state.application;
 
-            if (!image)
+            if (!app)
                 return React.DOM.div({className: 'loading'});
 
             return React.DOM.div({}, 
-                React.DOM.h1({}, image.get('name_or_id')),
-                Cards.Rating({rating: image.get('rating')}),
+                React.DOM.h1({}, app.get('name_or_id')),
+                Cards.Rating({rating: app.get('rating')}),
                 React.DOM.h2({}, "Description"),
-                React.DOM.p({}, image.get('description')),
+                React.DOM.p({}, app.get('description')),
                 React.DOM.h2({}, "Versions of this Image"));
         }
     });
 
-    return ImageDetail;
+    return ApplicationDetail;
 });
