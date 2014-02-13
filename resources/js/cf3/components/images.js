@@ -4,9 +4,29 @@ define(['react', 'underscore', 'components/page_header',
     function(React, _, PageHeader, Applications, Gravatar, router, Rating) {
 
     var Bookmark = React.createClass({
+        getInitialState: function() {
+            return {
+                isFavorite: this.props.image.get('favorite')
+            };
+        },
+        updateFavorite: function(model) {
+            this.setState({'isFavorite': model.get('favorite')});
+        },
+        componentDidMount: function() {
+            this.props.image.on('change:favorite', this.updateFavorite);
+        },
+        componentWillUnmount: function() {
+            this.props.image.off('change:favorite', this.updateFavorite);
+        },
+        toggleFavorite: function(e) {
+            e.preventDefault();
+            this.props.image.set('favorite', !this.props.image.get('favorite'));
+        },
         render: function() {
-            return React.DOM.div({
-                className: 'bookmark ' + (this.props.favorite ? 'on' : 'off')
+            return React.DOM.a({
+                className: 'bookmark ' + (this.state.isFavorite ? 'on' : 'off'),
+                href: '#',
+                onClick: this.toggleFavorite
             });
         }
     });
@@ -43,7 +63,7 @@ define(['react', 'underscore', 'components/page_header',
                         title: app.get('name_or_id')
                     }, app.get('name_or_id'))),
                 Rating({rating: app.get('rating')}),
-                Bookmark({favorite: app.get('favorite')}));
+                Bookmark({image: app}));
         }
     });
 
