@@ -35,7 +35,7 @@ define(['backbone', 'react'], function(Backbone, React) {
             });
         },
         images: function() {
-            this.setView(['components/images'], function(Images) {
+            this.setView(['components/images/list'], function(Images) {
                 console.log(arguments);
                 return Images();
             });
@@ -45,7 +45,7 @@ define(['backbone', 'react'], function(Backbone, React) {
         imageAuthored: function() {
         },
         imageDetail: function(id) {
-            this.setView(['components/image_detail'], function(ImageDetail) {
+            this.setView(['components/images/detail'], function(ImageDetail) {
                 return ImageDetail({image_id: id});
             });
         },
