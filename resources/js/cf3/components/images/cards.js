@@ -58,7 +58,7 @@ define(['react', 'components/common/gravatar', 'router'], function(React, Gravat
             else
                 icon = Gravatar({hash: app.get('uuid_hash'), size: iconSize});
 
-            var imageUri = "images/" + app.get('uuid');
+            var imageUri = url_root + "images/" + app.get('uuid');
 
             return React.DOM.li({}, 
                 React.DOM.div({className: 'icon-container'}, React.DOM.a({
