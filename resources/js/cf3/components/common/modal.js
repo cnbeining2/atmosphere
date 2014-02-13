@@ -5,7 +5,7 @@ define(['react', 'bootstrap'], function(React) {
             return React.DOM.div({
                 id: this.props.id,
                 className: 'modal fade',
-                tabindex: '-1',
+                tabIndex: '-1',
                 role: 'dialog',
                 'aria-hidden': 'true'
                 },
