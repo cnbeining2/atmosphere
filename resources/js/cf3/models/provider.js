@@ -5,10 +5,7 @@ define(['underscore', 'models/base'], function(_, Base) {
         parse: function(response) {
             var attributes = response;
             
-            attributes.id = response.id;
-            attributes.location = response.location;
-            attributes.public = response.public;
-            
+            attributes.description = "One day, providers will have descriptions. That will be a good day. For now, this is filler text. #sorryNotSorry";
             return attributes;
         },
         url: function(){

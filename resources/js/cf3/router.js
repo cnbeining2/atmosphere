@@ -62,8 +62,8 @@ define(['backbone', 'react'], function(Backbone, React) {
             });
         },
         providers: function() {
-            this.setView(['components/providers'], function(Providers) {
-                return Providers();
+            this.setView(['components/providers', 'providers'], function(Providers, collection) {
+                return Providers({providers: collection});
             });
         },
         settings: function() {
