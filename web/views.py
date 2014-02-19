@@ -109,35 +109,28 @@ def logout(request):
         return cas_logoutRedirect()
     return HttpResponseRedirect(settings.REDIRECT_URL+'/login')
 
+def maintenance_response():
+    records = MaintenanceRecord.active()
+    template = get_template("maintenance.html")
+    context = Context({
+        'site_root': settings.REDIRECT_URL,
+        'debug': settings.DEBUG,
+        'year': datetime.now().year,
+        'records': records
+    })
+    output = template.render(context)
+    return HttpResponse(output, status=503)
 
-@atmo_login_required
 def app(request):
-    try:
-        if MaintenanceRecord.disable_login_access(request):
-            return HttpResponseRedirect('/login/')
-        template = get_template("cf2/index.html")
-        context = RequestContext(request, {
-            'site_root': settings.REDIRECT_URL,
-            'debug': settings.DEBUG,
-            'year': datetime.now().year
-        })
-        output = template.render(context)
-        return HttpResponse(output)
-    except KeyError, e:
-        logger.debug("User not logged in.. Redirecting to CAS login")
-        return cas_loginRedirect(request, settings.REDIRECT_URL+'/application')
-    except Exception, e:
-        logger.exception(e)
-        return cas_loginRedirect(request, settings.REDIRECT_URL+'/application')
-
-def app_beta(request):
     logger.debug("APP BETA")
     try:
         #TODO Reimplment maintenance record check
+        if MaintenanceRecord.disable_login_access(request):
+            return maintenance_response()
         template = get_template("cf3/index.html")
         context = RequestContext(request, {
             'site_root': settings.REDIRECT_URL,
-            'url_root': '/beta/',
+            'url_root': '/application/',
             'debug': settings.DEBUG,
             'year': datetime.now().year
         })
@@ -145,10 +138,10 @@ def app_beta(request):
         return HttpResponse(output)
     except KeyError, e:
         logger.debug("User not logged in.. Redirecting to CAS login")
-        return cas_loginRedirect(request, settings.REDIRECT_URL+'/beta')
+        return cas_loginRedirect(request, settings.REDIRECT_URL+'/application')
     except Exception, e:
         logger.exception(e)
-        return cas_loginRedirect(request, settings.REDIRECT_URL+'/beta')
+        return cas_loginRedirect(request, settings.REDIRECT_URL+'/application')
 
 
 @atmo_valid_token_required

@@ -1,0 +1,19 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <title>Atmosphere</title>
+    </head>
+    <body>
+        <p>Atmosphere's down</p>
+        {% for record in records %}
+            <div class='maintenance-message'
+          id='maintenance-record-{{record.id}}'><i class="glyphicon glyphicon-info-sign
+          icon-white"></i>
+            {% if record.provider %}
+            {{record.provider}} {{record.message}}
+            {% else %}
+            {{record.message}}
+            {% endif %}</div>
+        {% endfor %}
+    <body>
+</html>

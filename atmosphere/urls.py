@@ -89,10 +89,6 @@ urlpatterns = patterns(
     url(r'^CASlogin/(?P<redirect>.*)$', 'authentication.cas_loginRedirect'),
     url(r'^application/$', 'web.views.app'),
 
-    # Experimental UI
-    # TODO: Rename to application when it launches
-    url(r'^beta/', 'web.views.app_beta'), # remove for production.
-
     url(r'^partials/(?P<path>.*)$', 'web.views.partial'),
     url(r'^no_user/$', 'web.views.no_user_redirect'),
 
