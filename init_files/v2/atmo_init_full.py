@@ -420,12 +420,12 @@ def vnc(user, distro, license=None):
             run_command(['/usr/bin/yum', '-qy', 'remove', 'vnc-E',
                          'realvnc-vnc-server'])
             download_file(
-                '%s/init_files/%s/VNC-Server-5.0.4-Linux-x64.rpm'
+                '%s/init_files/%s/VNC-Server-5.1.0-Linux-x64.rpm'
                 % (ATMOSERVER, SCRIPT_VERSION),
-                "/opt/VNC-Server-5.0.4-Linux-x64.rpm",
-                match_hash='0c59f2d84880a6848398870e5f0aa39f09e413bc')
+                "/opt/VNC-Server-5.1.0-Linux-x64.rpm",
+                match_hash='5e62e4d456ceb2b473509bbd0064694d9820a738')
             run_command(['/bin/rpm', '-Uvh',
-                         '/opt/VNC-Server-5.0.4-Linux-x64.rpm'])
+                         '/opt/VNC-Server-5.1.0-Linux-x64.rpm'])
             run_command(['/bin/sed', '-i',
                          "'$a account    include      system-auth'",
                          '/etc/pam.d/vncserver.custom'], bash_wrap=True)
@@ -435,12 +435,12 @@ def vnc(user, distro, license=None):
 
         else:
             download_file(
-                '%s/init_files/%s/VNC-Server-5.0.4-Linux-x64.deb'
+                '%s/init_files/%s/VNC-Server-5.1.0-Linux-x64.deb'
                 % (ATMOSERVER, SCRIPT_VERSION),
-                "/opt/VNC-Server-5.0.4-Linux-x64.deb",
-                match_hash='c2b390157c82fd556e60fe392b6c5bc5c5efcb29')
+                "/opt/VNC-Server-5.1.0-Linux-x64.deb",
+                match_hash='96050939b98a0d91c6f293401230dbd22922ec2e')
             run_command(['/usr/bin/dpkg', '-i',
-                         '/opt/VNC-Server-5.0.4-Linux-x64.deb'])
+                         '/opt/VNC-Server-5.1.0-Linux-x64.deb'])
             new_file = open('/etc/pam.d/vncserver.custom', 'w')
             new_file.write("auth include  common-auth")
             new_file.close()
@@ -452,7 +452,7 @@ def vnc(user, distro, license=None):
         download_file(
             '%s/init_files/%s/vnc-config.sh' % (ATMOSERVER, SCRIPT_VERSION),
             os.path.join(USER_HOME_DIR, 'vnc-config.sh'),
-            match_hash='37b64977dbf3650f307ca0d863fee18938038dce')
+            match_hash='9bbb495ad67bb3117349a637e5716ba08a213713')
         run_command(['/bin/chmod', 'a+x',
                      os.path.join(USER_HOME_DIR, 'vnc-config.sh')])
         run_command([os.path.join(USER_HOME_DIR, 'vnc-config.sh')])
@@ -644,7 +644,6 @@ def notify_launched_instance(instance_data, metadata):
     except ImportError:
         #Support for python 2.4
         import simplejson as json
-    from httplib2 import Http
     service_url = instance_data['atmosphere']['instance_service_url']
     userid = instance_data['atmosphere']['userid']
     instance_token = instance_data['atmosphere']['instance_token']
@@ -656,12 +655,13 @@ def notify_launched_instance(instance_data, metadata):
         'token': instance_token,
         'name': instance_name,
     }
-    h = Http(disable_ssl_certificate_validation=True)
-    headers = {'Content-type': 'application/json'}
-    resp, content = h.request(service_url, "POST",
-                              headers=headers, body=json.dumps(data))
-    logging.debug(resp)
-    logging.debug(content)
+    data = json.dumps(data)
+    request = urllib2.Request(service_url, data, {'Content-Type':
+        'application/json'})
+    link = urllib2.urlopen(request)
+    response = link.read()
+    link.close()
+    logging.debug(response)
 
 
 def distro_files(distro):
@@ -690,7 +690,7 @@ def install_motd(distro):
                       + 'atmosphere/motd',
                       '/etc/motd.tail',
                       match_hash='b8ef30b1b7d25fcaf300ecbc4ee7061e986678c4')
-    include_motd_more(distro):
+    include_motd_more(distro)
 
 
 def include_motd_more(distro):
