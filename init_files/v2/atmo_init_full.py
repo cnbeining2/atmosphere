@@ -230,6 +230,8 @@ def etc_skel_bashrc(user):
 export IDS_HOME="/irods/data.iplantc.org/iplant/home/%s"
 alias ids_home="cd $IDS_HOME"
 """ % user)
+
+
 def in_sudoers(user):
     out, err = run_command(['sudo -l -U %s' % user], shell=True)
     if 'not allowed to run sudo' in out:
@@ -396,6 +398,8 @@ def mount_storage():
         for line in outLines:
             r = re.compile(', (.*?) bytes')
             match = r.search(line)
+            if not match:
+                continue
             if dev_1 in line:
                 dev_1_size = match.group(1)
             elif dev_2 in line:
@@ -409,6 +413,30 @@ def mount_storage():
         logging.exception("Could not mount storage. Error below:")
 
 
+def start_vncserver(user):
+    if not running_process("vncserver", user):
+        run_command(['/bin/su', '%s' % user, '-c', '/usr/bin/vncserver'])
+
+def running_process(proc_name, user=None):
+    if user:
+        logging.debug("Limiting scope of Process %s to those launched by %s"
+                      % (proc_name, user))
+        pgrep_str = "pgrep -u %s %s" % (user, proc_name)
+    else:
+        pgrep_str = "pgrep %s" % proc_name
+    out, err = run_command([pgrep_str], shell=True)
+    #Output if running:
+    #4444
+    #4445  (The Running PIDs)
+    #Output if not running:
+    #      (Empty)
+    if len(out) > 1:
+        logging.debug("Found PID(s) %s for proccess name:%s"
+                      % (out, proc_name))
+        return True
+    logging.debug("No PID found for proccess name:%s" % (proc_name))
+    return False
+
 def vnc(user, distro, license=None):
     try:
         if not os.path.isfile('/usr/bin/xterm'):
@@ -420,27 +448,26 @@ def vnc(user, distro, license=None):
             run_command(['/usr/bin/yum', '-qy', 'remove', 'vnc-E',
                          'realvnc-vnc-server'])
             download_file(
-                '%s/init_files/%s/VNC-Server-5.1.0-Linux-x64.rpm'
+                '%s/init_files/%s/VNC-Server-5.0.4-Linux-x64.rpm'
                 % (ATMOSERVER, SCRIPT_VERSION),
-                "/opt/VNC-Server-5.1.0-Linux-x64.rpm",
-                match_hash='5e62e4d456ceb2b473509bbd0064694d9820a738')
+                "/opt/VNC-Server-5.0.4-Linux-x64.rpm",
+                match_hash='0c59f2d84880a6848398870e5f0aa39f09e413bc')
             run_command(['/bin/rpm', '-Uvh',
-                         '/opt/VNC-Server-5.1.0-Linux-x64.rpm'])
+                         '/opt/VNC-Server-5.0.4-Linux-x64.rpm'])
             run_command(['/bin/sed', '-i',
                          "'$a account    include      system-auth'",
                          '/etc/pam.d/vncserver.custom'], bash_wrap=True)
             run_command(['/bin/sed', '-i',
                          "'$a password   include      system-auth'",
                          '/etc/pam.d/vncserver.custom'], bash_wrap=True)
-
         else:
             download_file(
-                '%s/init_files/%s/VNC-Server-5.1.0-Linux-x64.deb'
+                '%s/init_files/%s/VNC-Server-5.0.4-Linux-x64.deb'
                 % (ATMOSERVER, SCRIPT_VERSION),
-                "/opt/VNC-Server-5.1.0-Linux-x64.deb",
-                match_hash='96050939b98a0d91c6f293401230dbd22922ec2e')
+                "/opt/VNC-Server-5.0.4-Linux-x64.deb",
+                match_hash='c2b390157c82fd556e60fe392b6c5bc5c5efcb29')
             run_command(['/usr/bin/dpkg', '-i',
-                         '/opt/VNC-Server-5.1.0-Linux-x64.deb'])
+                         '/opt/VNC-Server-5.0.4-Linux-x64.deb'])
             new_file = open('/etc/pam.d/vncserver.custom', 'w')
             new_file.write("auth include  common-auth")
             new_file.close()
@@ -452,7 +479,7 @@ def vnc(user, distro, license=None):
         download_file(
             '%s/init_files/%s/vnc-config.sh' % (ATMOSERVER, SCRIPT_VERSION),
             os.path.join(USER_HOME_DIR, 'vnc-config.sh'),
-            match_hash='9bbb495ad67bb3117349a637e5716ba08a213713')
+            match_hash='37b64977dbf3650f307ca0d863fee18938038dce')
         run_command(['/bin/chmod', 'a+x',
                      os.path.join(USER_HOME_DIR, 'vnc-config.sh')])
         run_command([os.path.join(USER_HOME_DIR, 'vnc-config.sh')])
@@ -464,7 +491,7 @@ def vnc(user, distro, license=None):
             run_command(['/bin/rm', '-rf', '/tmp/.X11-unix'])
         run_command(['/bin/mkdir', '/tmp/.X11-unix'])
         run_command(['/bin/chmod', 'a+rwxt', '/tmp/.X11-unix'])
-        run_command(['/bin/su', '%s' % user, '-c', '/usr/bin/vncserver'])
+        start_vncserver(user)
     except Exception, e:
         logging.exception('Failed to install VNC')
 
@@ -579,10 +606,6 @@ def modify_rclocal(username, distro, hostname='localhost'):
                            'depmod -a\n'
                            'modprobe acpiphp\n'
                            'hostname %s\n'  # public_ip
-                           '/bin/su %s -c /usr/bin/vncserver\n'  # username
-                           '/usr/bin/nohup /usr/local/bin/shellinaboxd -b -t '
-                           '-f beep.wav:/dev/null '
-                           '> /var/log/atmo/shellinaboxd.log 2>&1 &\n'
                            #Add new rc.local commands here
                            #And they will be excecuted on startup
                            #Don't forget the newline char
@@ -606,12 +629,20 @@ def shellinaboxd(distro):
     download_file('%s/init_files/%s/shellinaboxd-install.sh'
                   % (ATMOSERVER, SCRIPT_VERSION),
                   shellinaboxd_file,
-                  match_hash='a2930f7cfe32df3d3d2e991e01cb0013d1071f15')
+                  match_hash='1e057ca1ac9986cb829d5c138d4f7d9532dcab12')
     run_command(['/bin/chmod', 'a+x', shellinaboxd_file])
     run_command([shellinaboxd_file], shell=True)
     run_command(['rm -rf '
                  + os.path.join(USER_HOME_DIR, 'shellinabox')
                  + '*'], shell=True)
+    start_shellinaboxd()
+
+def start_shellinaboxd():
+    if not running_process("shellinaboxd"):
+        run_command([
+            "/usr/bin/nohup /usr/local/bin/shellinaboxd -b -t "
+            "-f beep.wav:/dev/null > /var/log/atmo/shellinaboxd.log 2>&1 &"
+            ], shell=True)
 
 
 def atmo_cl():
@@ -657,7 +688,7 @@ def notify_launched_instance(instance_data, metadata):
     }
     data = json.dumps(data)
     request = urllib2.Request(service_url, data, {'Content-Type':
-        'application/json'})
+                                                  'application/json'})
     link = urllib2.urlopen(request)
     response = link.read()
     link.close()
@@ -840,6 +871,7 @@ def denyhost_whitelist():
         write_to_file(filename, allowed_hosts_content)
     return
 
+
 def update_sudoers():
     run_command(['/bin/sed', '-i',
                  "s/^Defaults    requiretty/#Defaults    requiretty/",
@@ -853,13 +885,15 @@ def ldap_replace():
 
 
 def ldap_install():
-    # package install
+    #TODO: if not ldap package
+    #TODO:     install ldap package
     ldap_replace()
 
 
 def insert_modprobe():
     run_command(['depmod', '-a'])
     run_command(['modprobe', 'acpiphp'])
+
 
 #File Operations
 def line_in_file(needle, filename):
@@ -871,6 +905,7 @@ def line_in_file(needle, filename):
             break
     f.close()
     return found
+
 
 def text_in_file(filename, text):
     file_contents = read_file(filename)
@@ -914,68 +949,17 @@ def append_to_file(filename, text):
         logging.exception("Failed to append to %s" % filename)
         logging.exception("Failed to append text: %s" % text)
 
-##MAIN##
-def main(argv):
-    init_logs('/var/log/atmo/atmo_init_full.log')
-    instance_data = {"atmosphere": {}}
-    service_type = None
-    instance_service_url = None
-    instance_service_url = None
-    server = None
-    root_password = None
-    user_id = None
-    vnclicense = None
-    try:
-        opts, args = getopt.getopt(
-            argv,
-            "t:u:s:i:T:N:v:",
-            ["service_type=", "service_url=", "server=", "user_id=", "token=",
-             "name=", "vnc_license=", "root_password="])
-    except getopt.GetoptError:
-        logging.error("Invalid arguments provided.")
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt in ("-t", "--service_type"):
-            instance_data["atmosphere"]["service_type"] = arg
-            service_type = arg
-        elif opt in ("-T", "--token"):
-            instance_data["atmosphere"]["instance_token"] = arg
-            instance_token = arg
-        elif opt in ("-N", "--name"):
-            instance_data["atmosphere"]["name"] = arg
-            instance_token = arg
-        elif opt in ("-u", "--service_url"):
-            instance_data["atmosphere"]["instance_service_url"] = arg
-            instance_service_url = arg
-        elif opt in ("-s", "--server"):
-            instance_data["atmosphere"]["server"] = arg
-            global ATMOSERVER
-            ATMOSERVER = arg
-            server = arg
-        elif opt in ("-i", "--user_id"):
-            instance_data["atmosphere"]["userid"] = arg
-            user_id = arg
-        elif opt in ("-v", "--vnc_license"):
-            #instance_data["atmosphere"]["vnc_license"] = arg
-            vnclicense = arg
-        elif opt in ("--root_password"):
-            root_password = arg
-        elif opt == '-d':
-            global _debug
-            _debug = 1
-            logging.setLevel(logging.DEBUG)
 
-    #TODO: What is this line for?
-    source = "".join(args)
-    logging.debug("Atmoserver - %s" % ATMOSERVER)
-    logging.debug("Atmosphere init parameters- %s" % instance_data)
-    set_user_home_dir()
-    instance_metadata = get_metadata()
-    logging.debug("Instance metadata - %s" % instance_metadata)
+def redeploy_atmo_init(user):
+    mount_storage()
+    start_vncserver(user)
+    start_shellinaboxd()
+
+
+def deploy_atmo_init(user, instance_data, instance_metadata, root_password, vnclicense):
     distro = get_distro()
     logging.debug("Distro - %s" % distro)
-
-    linuxuser = instance_data['atmosphere']['userid']
+    linuxuser = user
     linuxpass = ""
     public_ip = get_public_ip(instance_metadata)
     hostname = get_hostname(instance_metadata)
@@ -1027,6 +1011,78 @@ def main(argv):
     modify_rclocal(linuxuser, distro, hostname)
     notify_launched_instance(instance_data, instance_metadata)
     logging.info("Complete.")
+
+
+def add_zsh():
+    if os.path.exists("/bin/zsh") and not os.path.exists("/usr/bin/zsh"):
+        run_command(['ln', '-s', '/bin/zsh', '/usr/bin/zsh'])
+            
+
+##MAIN##
+def main(argv):
+    init_logs('/var/log/atmo/atmo_init_full.log')
+    instance_data = {"atmosphere": {}}
+    service_type = None
+    instance_service_url = None
+    instance_service_url = None
+    server = None
+    root_password = None
+    user_id = None
+    redeploy = False
+    vnclicense = None
+    try:
+        opts, args = getopt.getopt(
+            argv,
+            "rt:u:s:i:T:N:v:",
+            ["redeploy", "service_type=", "service_url=", "server=", "user_id=", "token=",
+             "name=", "vnc_license=", "root_password="])
+    except getopt.GetoptError:
+        logging.error("Invalid arguments provided.")
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-t", "--service_type"):
+            instance_data["atmosphere"]["service_type"] = arg
+            service_type = arg
+        elif opt in ("-T", "--token"):
+            instance_data["atmosphere"]["instance_token"] = arg
+            instance_token = arg
+        elif opt in ("-N", "--name"):
+            instance_data["atmosphere"]["name"] = arg
+            instance_token = arg
+        elif opt in ("-u", "--service_url"):
+            instance_data["atmosphere"]["instance_service_url"] = arg
+            instance_service_url = arg
+        elif opt in ("-s", "--server"):
+            instance_data["atmosphere"]["server"] = arg
+            global ATMOSERVER
+            ATMOSERVER = arg
+            server = arg
+        elif opt in ("-i", "--user_id"):
+            instance_data["atmosphere"]["userid"] = arg
+            user_id = arg
+        elif opt in ("-v", "--vnc_license"):
+            vnclicense = arg
+        elif opt in ("-r", "--redeploy"):
+            redeploy = True
+        elif opt in ("--root_password"):
+            root_password = arg
+        elif opt == '-d':
+            global _debug
+            _debug = 1
+            logging.setLevel(logging.DEBUG)
+
+    #TODO: What is this line for?
+    source = "".join(args)
+    logging.debug("Atmoserver - %s" % ATMOSERVER)
+    logging.debug("Atmosphere init parameters- %s" % instance_data)
+    set_user_home_dir()
+    add_zsh()
+    if redeploy:
+        redeploy_atmo_init(user_id)
+    else:
+        instance_metadata = get_metadata()
+        logging.debug("Instance metadata - %s" % instance_metadata)
+        deploy_atmo_init(user_id, instance_data, instance_metadata, root_password, vnclicense)
 
 
 if __name__ == "__main__":

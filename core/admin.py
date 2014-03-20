@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth.models import Group as DjangoGroup
+from django.contrib.sessions.models import Session as DjangoSession
 from django.utils import timezone
 
 from core.models.application import Application
@@ -11,7 +12,7 @@ from core.models.credential import Credential, ProviderCredential
 from core.models.group import Group, IdentityMembership, ProviderMembership
 from core.models.identity import Identity
 from core.models.instance import Instance, InstanceStatusHistory
-from core.models.machine import ProviderMachine
+from core.models.machine import ProviderMachine, ProviderMachineMembership
 from core.models.machine_request import MachineRequest
 from core.models.maintenance import MaintenanceRecord
 from core.models.node import NodeController
@@ -26,6 +27,10 @@ from core.models.user import AtmosphereUser
 from core.models.volume import Volume
 
 from core.application import save_app_data
+
+def private_object(modeladmin, request, queryset):
+        queryset.update(private=True)
+private_object.short_description = 'Make objects private True'
 
 def end_date_object(modeladmin, request, queryset):
         queryset.update(end_date=timezone.now())
@@ -46,7 +51,7 @@ class MaintenanceAdmin(admin.ModelAdmin):
 
 
 class QuotaAdmin(admin.ModelAdmin):
-    list_display = ("__unicode__", "cpu", "memory", "storage", "storage_count")
+    list_display = ("__unicode__", "cpu", "memory", "storage", "storage_count", "suspended_count")
 
 
 class AllocationAdmin(admin.ModelAdmin):
@@ -75,8 +80,27 @@ class ProviderMachineAdmin(admin.ModelAdmin):
     list_filter = [
         "provider__location",
         "application__featured",
+        "application__private",
     ]
 
+class ProviderMachineMembershipAdmin(admin.ModelAdmin):
+    list_display = ["id", "_pm_provider", "_pm_identifier", "_pm_name",
+                    "_pm_private", "group"]
+    list_filter = [
+            "provider_machine__provider__location",
+            "provider_machine__identifier",
+            "group__name"
+            ]
+    def _pm_provider(self, obj):
+        return obj.provider_machine.provider.location
+    def _pm_private(self, obj):
+        return obj.provider_machine.application.private
+    _pm_private.boolean = True
+    def _pm_identifier(self, obj):
+        return obj.provider_machine.identifier
+    def _pm_name(self, obj):
+        return obj.provider_machine.application.name
+    pass
 
 class ProviderCredentialInline(admin.TabularInline):
     model = ProviderCredential
@@ -130,7 +154,7 @@ class VolumeAdmin(admin.ModelAdmin):
 
 
 class ApplicationAdmin(admin.ModelAdmin):
-    actions = [end_date_object, ]
+    actions = [end_date_object, private_object]
     search_fields = ["name", "id"]
     list_display = [
         "name", "start_date", "end_date", "private", "featured", "created_by"]
@@ -204,11 +228,19 @@ class MachineRequestAdmin(admin.ModelAdmin):
     search_fields = ["new_machine_owner__username", "new_machine_name", "instance__provider_alias"]
     list_display = ["new_machine_name", "new_machine_owner",
                     "new_machine_provider",  "start_date",
-                    "end_date", "status", "opt_parent_machine",
+                    "end_date", "status", "opt_parent_machine", "opt_machine_visibility", 
                     "opt_new_machine"]
     list_filter = ["instance__provider_machine__provider__location",
                    "new_machine_provider__location",
+                   "new_machine_visibility",
                    "status"]
+
+    def opt_machine_visibility(self, machine_request):
+        if machine_request.new_machine_visibility.lower() != 'public':
+            return "%s\nUsers:%s" % (machine_request.new_machine_visibility,
+                                        machine_request.access_list)
+        return machine_request.new_machine_visibility
+    opt_machine_visibility.allow_tags = True
 
     def opt_parent_machine(self, machine_request):
         if machine_request.parent_machine:
@@ -234,7 +266,13 @@ class InstanceAdmin(admin.ModelAdmin):
     list_display = ["provider_alias", "name", "created_by", "ip_address"]
     list_filter = ["provider_machine__provider__location"]
 
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+    list_display = ['session_key', '_session_data', 'expire_date']
+    search_fields = ["session_key", ]
 
+admin.site.register(DjangoSession, SessionAdmin)
 admin.site.register(Credential)
 admin.site.unregister(DjangoGroup)
 admin.site.register(Group)
@@ -249,6 +287,7 @@ admin.site.register(MaintenanceRecord, MaintenanceAdmin)
 admin.site.register(NodeController, NodeControllerAdmin)
 admin.site.register(Provider, ProviderAdmin)
 admin.site.register(ProviderMachine, ProviderMachineAdmin)
+admin.site.register(ProviderMachineMembership, ProviderMachineMembershipAdmin)
 admin.site.register(ProviderMembership, ProviderMembershipAdmin)
 admin.site.register(ProviderType)
 admin.site.register(Quota, QuotaAdmin)

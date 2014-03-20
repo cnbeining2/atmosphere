@@ -1,58 +1,116 @@
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+
 from django.utils import timezone
-from celery.task import periodic_task
+
+from celery.decorators import task
 from celery.task.schedules import crontab
 
-from atmosphere import settings
+from core.models.group import Group
+from core.models.user import AtmosphereUser
+from core.models.provider import Provider
+
 from service.allocation import check_over_allocation
+from service.driver import get_admin_driver
 
 from threepio import logger
 
 
-@periodic_task(run_every=crontab(hour='*', minute='*/15', day_of_week='*'),
-               time_limit=120, retry=0,
-               expires=10*60) # Task expires 10min after scheduling
+@task(name="monitor_instances")
 def monitor_instances():
     """
-    This task should be run ONCE every 5m-15m
+    Update instances for each active provider.
     """
-    #Only check if allocations are being enforced
-    if settings.DEBUG:
-        logger.info('Do not enforce allocations in DEBUG mode')
-        return False
-    from api import get_esh_driver
-    from core.models import IdentityMembership
-    for im in IdentityMembership.objects.all():
-        #Only check if allocation has been set
-        if not im.allocation:
-            continue
-        #Skip inactive providers, end-dated providers
-        if not im.identity.provider.is_active():
-            continue
-        #Start by checking for running/missing instances
-        core_instances = im.identity.instance_set.filter(end_date=None)
-        if not core_instances:
-            continue
-
-        #Running/missing instances found. We may have to do something!
-        driver = get_esh_driver(im.identity)
-        esh_instances = driver.list_instances()
-
-        #Test allocation && Suspend instances if we are over allocated time
-        over_allocation = over_allocation_test(im.identity, esh_instances)
-        if over_allocation:
-            continue
-        #We may need to update instance status history
-        update_instances(im.identity, esh_instances, core_instances)
+    for p in Provider.get_active():
+        monitor_instances_for(p)
 
 
+def get_instance_owner_map(provider):
+    """
+    All keys == All identities
+    """
+    admin_driver = get_admin_driver(provider)
+    meta = admin_driver.meta(admin_driver=admin_driver)
+    all_identities = provider.identity_set.all()
+    logger.info("Retrieving all tenants..")
+    all_tenants = admin_driver._connection._keystone_list_tenants()
+    logger.info("Retrieved %s tenants. Retrieving all instances.."
+                % len(all_tenants))
+    all_instances = meta.all_instances()
+    logger.info("Retrieved %s instances." % len(all_instances))
+    #Convert instance.owner from tenant-id to tenant-name all at once
+    all_instances = _convert_tenant_id_to_names(all_instances, all_tenants)
+    logger.info("Owner information added.")
+    #Make a mapping of owner-to-instance
+    instance_map = _make_instance_owner_map(all_instances)
+    logger.info("Instance owner map created")
+    identity_map = _include_all_idents(all_identities, instance_map)
+    logger.info("Identity map created")
+    return identity_map
+
+def monitor_instances_for(provider):
+    """
+    Update instances for provider.
+    """
+    #For now, lets just ignore everything that isn't openstack.
+    if 'openstack' not in provider.type.name.lower():
+        return
+    instance_map = get_instance_owner_map(provider)
+    for username in instance_map.keys():
+        try:
+            user = AtmosphereUser.objects.get(username=username)
+            group = Group.objects.get(name=user.username)
+            ident = user.identity_set.get(provider=provider)
+            im = ident.identitymembership_set.get(member=group)
+            if not im.allocation:
+                continue
+            instances = instance_map[username]
+            over_allocation = over_allocation_test(im.identity, instances)
+            if over_allocation:
+                continue
+            core_instances = im.identity.instance_set.filter(end_date=None)
+            update_instances(im.identity, instances, core_instances)
+        except:
+            logger.exception("Unable to monitor User:%s" % username)
+    logger.info("Monitoring completed")
+
+    
+def _include_all_idents(identities, owner_map):
+    #Include all identities with 0 instances to the monitoring
+    identity_owners = [ident.get_credential('ex_tenant_name')
+                       for ident in identities]
+    owners_w_instances = owner_map.keys()
+    for user in identity_owners:
+        if user not in owners_w_instances:
+            owner_map[user] = []
+    return owner_map
+
+def _make_instance_owner_map(instances):
+    owner_map = {}
+    for i in instances:
+        key = i.owner
+        instance_list = owner_map.get(key, [])
+        instance_list.append(i)
+        owner_map[key] = instance_list
+    return owner_map
+
+
+def _convert_tenant_id_to_names(instances, tenants):
+    for i in instances:
+        for tenant in tenants:
+            if tenant['id'] == i.owner:
+                i.owner = tenant['name']
+    return instances
 
 def over_allocation_test(identity, esh_instances):
     from api import get_esh_driver
     from core.models.instance import convert_esh_instance
     from atmosphere import settings
     over_allocated, time_diff = check_over_allocation(
-        identity.created_by.username, identity.id)
+        identity.created_by.username, identity.id,
+        time_period=relativedelta(day=1, months=1))
+    logger.info("Overallocation Test: %s - %s - %s\tInstances:%s"
+                % (identity.created_by.username, over_allocated, time_diff, esh_instances))
     if not over_allocated:
         # Nothing changed, bail.
         return False
@@ -85,7 +143,7 @@ def update_instances(identity, esh_list, core_list):
     && Update the values of instances that do
     """
     esh_ids = [instance.id for instance in esh_list]
-    logger.info('Instances for Identity %s: %s' % (identity, esh_ids))
+    #logger.info('%s Instances for Identity %s: %s' % (len(esh_ids), identity, esh_ids))
     for core_instance in core_list:
         try:
             index = esh_ids.index(core_instance.provider_alias)

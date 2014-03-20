@@ -9,9 +9,11 @@ CELERY_APP="atmosphere"
 
 # Atmosphere setup with an exclusive queue for imaging.. Uncomment these lines.
 # 2 Celery Queues, First is 'default', concurrency 8 and the second is 'imaging', concurrency 1
-CELERYD_NODES="atmosphere-node_1 imaging"
+CELERYD_NODES="atmosphere-node_1 imaging celery_periodic"
 # Extra arguments to pass to celeryd
-CELERYD_OPTS="-c:atmosphere-node_1 8 -Q:imaging imaging -c:imaging 1"
+CELERYD_OPTS="-c:atmosphere-node_1 6"
+CELERYD_OPTS="$CELERYD_OPTS -Q:imaging imaging -c:imaging 1"
+CELERYD_OPTS="$CELERYD_OPTS -Q:celery_periodic celery_periodic -c:celery_periodic 1"
 
 #Our celery requires root access for sudo/chroot/mount
 C_FORCE_ROOT="True"
@@ -53,9 +55,10 @@ CELERYD_GROUP="root"
 # Additional celery flower settings
 ###
 
+FLOWER_ACCESS_LIST="contact.steve.gregory@gmail.com|ipc.edwin@gmail.com|aedmonds60@gmail.com|jmatt@jmatt.org|cjlarose@gmail.com|cjlarose@email.arizona.edu|netvato@gmail.com|rbovill@gmail.com|jerry57@gmail.com|sangeeta@email.arizona.edu|ipc.dboss@gmail.com|amercer1@email.arizona.edu"
 FLOWER_LOG_FILE="/var/log/celery/flower.log"
 CELERYD_FLOWER="$CELERYD_CHDIR/manage.py celery flower"
-CELERY_FLOWER_OPTS="--certfile=$SSH_CERT_FILE --keyfile=$SSH_KEY_FILE --port=8443 --log_file_prefix=$FLOWER_LOG_FILE --logging=warn --url_prefix=flower"
+CELERY_FLOWER_OPTS="--certfile=$SSH_CERT_FILE --keyfile=$SSH_KEY_FILE --port=8443 --log_file_prefix=$FLOWER_LOG_FILE --logging=warn --url_prefix=flower --auth=$FLOWER_ACCESS_LIST"
 
 ###
 #
@@ -73,4 +76,4 @@ CELERYBEAT_LOG_FILE="/var/log/celery/celerybeat.log"
 CELERYBEAT_PID_FILE="/var/run/celerybeat.pid"
 
 #Default is INFO
-#CELERYBEAT_LOG_LEVEL="INFO"
+CELERYBEAT_LOG_LEVEL="DEBUG"

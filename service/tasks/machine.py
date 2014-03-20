@@ -33,7 +33,7 @@ def start_machine_imaging(machine_request, delay=False):
     Builds up a machine imaging task using core.models.machine_request
     delay - If true, wait until task is completed before returning
     """
-    machine_request.status = 'processing'
+    machine_request.status = 'imaging'
     machine_request.save()
     instance_id = machine_request.instance.provider_alias
 
@@ -43,10 +43,10 @@ def start_machine_imaging(machine_request, delay=False):
 
     #Step 1 - On OpenStack, sync/freeze BEFORE starting migration/imaging
     init_task = None
-    if orig_managerCls == OSImageManager:  # TODO:AND if instance still running
-        freeze_task = freeze_instance_task.si(
-            machine_request.instance.created_by_identity_id, instance_id)
-        init_task = freeze_task
+    #if orig_managerCls == OSImageManager:  # TODO:AND if instance still running
+    #    freeze_task = freeze_instance_task.si(
+    #        machine_request.instance.created_by_identity_id, instance_id)
+    #    init_task = freeze_task
     if dest_managerCls and dest_creds != orig_creds:
         #Will run machine imaging task..
         migrate_task = migrate_instance_task.si(
@@ -115,9 +115,6 @@ def machine_request_error(task_uuid, machine_request_id):
         exc = result.get(propagate=False)
     err_str = "ERROR - %r Exception:%r" % (result.result, result.traceback,)
     logger.error(err_str)
-    max_len = MachineRequest._meta.get_field('status').max_length
-    if len(err_str) > max_len:
-        err_str = err_str[:max_len-3]+'...'
     machine_request = MachineRequest.objects.get(id=machine_request_id)
     machine_request.status = err_str
     machine_request.save()
@@ -128,6 +125,8 @@ def process_request(new_image_id, machine_request_id):
     #if ipdb:
     #    ipdb.set_trace()
     machine_request = MachineRequest.objects.get(id=machine_request_id)
+    machine_request.status = 'processing - %s' % new_image_id
+    machine_request.save()
     invalidate_machine_cache(machine_request)
     set_machine_request_metadata(machine_request, new_image_id)
     process_machine_request(machine_request, new_image_id)

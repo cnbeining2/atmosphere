@@ -27,13 +27,15 @@ from core.models.volume import convert_esh_volume
 
 from service import task
 from service.deploy import build_script
-from service.instance import launch_instance, start_instance,\
-    stop_instance, suspend_instance, resume_instance,\
+from service.instance import redeploy_init, reboot_instance,\
+    launch_instance, resize_instance, confirm_resize,\
+    start_instance, resume_instance,\
+    stop_instance, suspend_instance,\
     update_instance_metadata
+
 from service.quota import check_over_quota
-from service.allocation import check_over_allocation
 from service.exceptions import OverAllocationError, OverQuotaError,\
-    SizeNotAvailable
+    SizeNotAvailable, HypervisorCapacityError
 
 from api import failure_response, prepare_driver, invalid_creds
 from api.serializers import InstanceSerializer, PaginatedInstanceSerializer
@@ -106,9 +108,12 @@ class InstanceList(APIView):
         #Pass these as args
         size_alias = data.pop('size_alias')
         machine_alias = data.pop('machine_alias')
+        hypervisor_name = data.pop('hypervisor',None)
         try:
             core_instance = launch_instance(user, provider_id, identity_id,
-                                            size_alias, machine_alias, **data)
+                                            size_alias, machine_alias, 
+                                            ex_availability_zone=hypervisor_name,
+                                            **data)
         except OverQuotaError, oqe:
             return over_quota(oqe)
         except OverAllocationError, oae:
@@ -117,6 +122,11 @@ class InstanceList(APIView):
             return size_not_availabe(snae)
         except InvalidCredsError:
             return invalid_creds(provider_id, identity_id)
+        except Exception as exc:
+            logger.exception("Encountered a generic exception. "
+                             "Returning 409-CONFLICT")
+            return failure_response(status.HTTP_409_CONFLICT,
+                                    exc.message)
 
         serializer = InstanceSerializer(core_instance, data=data)
         #NEVER WRONG
@@ -271,12 +281,15 @@ class InstanceAction(APIView):
                 size_alias = action_params.get('size', '')
                 if type(size_alias) == int:
                     size_alias = str(size_alias)
-                size = esh_driver.get_size(size_alias)
-                esh_driver.resize_instance(esh_instance, size)
+                resize_instance(esh_driver, esh_instance, size_alias,
+                               provider_id, identity_id, user)
             elif 'confirm_resize' == action:
-                esh_driver.confirm_resize_instance(esh_instance)
+                confirm_resize(esh_driver, esh_instance,
+                               provider_id, identity_id, user)
             elif 'revert_resize' == action:
                 esh_driver.revert_resize_instance(esh_instance)
+            elif 'redeploy' == action:
+                redeploy_init(esh_driver, esh_instance, countdown=None)
             elif 'resume' == action:
                 resume_instance(esh_driver, esh_instance,
                                 provider_id, identity_id, user)
@@ -292,7 +305,7 @@ class InstanceAction(APIView):
             elif 'reset_network' == action:
                 esh_driver.reset_network(esh_instance)
             elif 'reboot' == action:
-                esh_driver.reboot_instance(esh_instance)
+                reboot_instance(esh_driver, esh_instance)
             elif 'rebuild' == action:
                 machine_alias = action_params.get('machine_alias', '')
                 machine = esh_driver.get_machine(machine_alias)
@@ -311,6 +324,8 @@ class InstanceAction(APIView):
             response = Response(api_response, status=status.HTTP_200_OK)
             return response
         ### Exception handling below..
+        except HypervisorCapacityError, hce:
+            return over_capacity(hce)
         except OverQuotaError, oqe:
             return over_quota(oqe)
         except OverAllocationError, oae:
@@ -371,7 +386,8 @@ class Instance(APIView):
         serializer = InstanceSerializer(core_instance, data=data, partial=True)
         if serializer.is_valid():
             logger.info('metadata = %s' % data)
-            update_instance_metadata(esh_driver, esh_instance, data)
+            update_instance_metadata(esh_driver, esh_instance, data,
+                    replace=False)
             serializer.save()
             response = Response(serializer.data)
             logger.info('data = %s' % serializer.data)
@@ -469,6 +485,12 @@ def size_not_availabe(sna_exception):
     return failure_response(
         status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
         sna_exception.message)
+
+
+def over_capacity(capacity_exception):
+    return failure_response(
+        status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+        capacity_exception.message)
 
 
 def over_quota(quota_exception):

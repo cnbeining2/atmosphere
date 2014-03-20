@@ -4,13 +4,15 @@ Tasks for driver operations.
 import re
 
 from operator import attrgetter
-from datetime import datetime
+from django.conf import settings
+from django.utils.timezone import datetime
 import time
 
 from celery import chain
 from celery.decorators import task
 from celery.task import current
 from celery.result import allow_join_result
+from celery.task.schedules import crontab
 from libcloud.compute.types import Provider, NodeState, DeploymentError
 
 from atmosphere.celery import app
@@ -28,22 +30,61 @@ from service.driver import get_driver
 from service.deploy import init
 
 
-@task(name="clear_empty_ips",
-      default_retry_delay=15,
-      ignore_result=True)
+@task(name="print_debug")
+def print_debug():
+    log_str = "print_debug task finished at %s." % datetime.now()
+    print log_str
+    logger.debug(log_str)
+
+@task(name="add_fixed_ip",
+        ignore_result=True,
+        default_retry_delay=15,
+        max_retries=15)
+def add_fixed_ip(driverCls, provider, identity, instance_id):
+    from service import instance as instance_service
+    try:
+        logger.debug("add_fixed_ip task started at %s." % datetime.now())
+        driver = get_driver(driverCls, provider, identity)
+        instance = driver.get_instance(instance_id)
+        if not instance:
+            logger.debug("Instance has been teminated: %s." % instance_id)
+            return None
+        i_status = instance._node.extra['status']
+        i_task = instance._node.extra['task']
+        if i_status not in ['active', 'suspended'] or i_task:
+                    raise Exception("Instance %s Status %s Task %s - Not Ready"
+                                    % (instance.id, i_status, i_task))
+        if instance._node.private_ips:
+            return instance
+        network_id = instance_service._convert_network_name(
+                driver, instance)
+        fixed_ip = driver._connection.ex_add_fixed_ip(instance, network_id)
+        logger.debug("add_fixed_ip task finished at %s." % datetime.now())
+        return fixed_ip
+    except Exception as exc:
+        if "Not Ready" not in str(exc):
+            # Ignore 'normal' errors.
+            logger.exception(exc)
+        add_fixed_ip.retry(exc=exc)
+
+@task(name="clear_empty_ips")
 def clear_empty_ips():
+    logger.debug("clear_empty_ips task started at %s." % datetime.now())
     from service import instance as instance_service
     from rtwo.driver import OSDriver
     from api import get_esh_driver
     from service.accounts.openstack import AccountDriver as\
         OSAccountDriver
+
     identities = Identity.objects.filter(
-        provider__type__name__iexact='openstack')
+        provider__type__name__iexact='openstack',
+        provider__active=True)
     identities = sorted(
        identities, key=lambda ident: attrgetter(ident.provider.type.name,
                                                 ident.created_by.username))
     os_acct_driver = None
-    for core_identity in identities:
+    total = len(identities)
+    for idx, core_identity in enumerate(identities):
         try:
             #Initialize the drivers
             driver = get_esh_driver(core_identity)
@@ -56,6 +97,8 @@ def clear_empty_ips():
             # Get useful info
             creds = core_identity.get_credentials()
             tenant_name = creds['ex_tenant_name']
+            logger.info("Checking Identity %s/%s - %s"
+                        % (idx+1, total, tenant_name))
             # Attempt to clean floating IPs
             num_ips_removed = driver._clean_floating_ip()
             if num_ips_removed:
@@ -82,10 +125,11 @@ def clear_empty_ips():
                     os_acct_driver.delete_network(core_identity,
                             remove_network=remove_network)
             else:
-                logger.info("No Network found. Skipping %s" % tenant_name)
+                #logger.info("No Network found. Skipping %s" % tenant_name)
+                pass
         except Exception as exc:
             logger.exception(exc)
-
+    logger.debug("clear_empty_ips task finished at %s." % datetime.now())
 
 @task(name="_send_instance_email",
       default_retry_delay=10,
@@ -166,8 +210,8 @@ def deploy_to(driverCls, provider, identity, instance_id, *args, **kwargs):
       default_retry_delay=20,
       ignore_result=True,
       max_retries=3)
-def deploy_init_to(driverCls, provider, identity, instance_id, password=None,
-                   *args, **kwargs):
+def deploy_init_to(driverCls, provider, identity, instance_id,
+                   password=None, redeploy=False, *args, **kwargs):
     try:
         logger.debug("deploy_init_to task started at %s." % datetime.now())
         driver = get_driver(driverCls, provider, identity)
@@ -177,9 +221,8 @@ def deploy_init_to(driverCls, provider, identity, instance_id, password=None,
             return
         image_metadata = driver._connection\
                                .ex_get_image_metadata(instance.machine)
-        image_already_deployed = image_metadata.get("deployed")
         deploy_chain = get_deploy_chain(driverCls, provider, identity,
-                                        instance, password, image_already_deployed)
+                                        instance, password, redeploy)
         deploy_chain.apply_async()
         #Can be really useful when testing.
         #if kwargs.get('delay'):
@@ -191,66 +234,49 @@ def deploy_init_to(driverCls, provider, identity, instance_id, password=None,
         logger.warn(exc)
         deploy_init_to.retry(exc=exc)
 
-def get_deploy_chain(driverCls, provider, identity, instance, password, deployed=False):
+def get_deploy_chain(driverCls, provider, identity,
+                     instance, password, redeploy=False):
     instance_id = instance.id
     if not instance.ip:
+        #Init the networking
         logger.debug("IP address missing")
-        init_task = update_metadata.si(
+        network_meta_task = update_metadata.si(
                 driverCls, provider, identity, instance_id,
                 {'tmp_status': 'networking'})
         floating_task = add_floating_ip.si(
             driverCls, provider, identity, instance_id, delete_status=True)
-        init_task.link(floating_task)
-        if not deployed:
-            logger.debug("Instance NOT deployed, include deployment and email")
-            deploy_meta_task = update_metadata.si(
-                driverCls, provider, identity, instance_id,
-                {'tmp_status': 'deploying'})
 
-            deploy_task = _deploy_init_to.si(
-                driverCls, provider, identity, instance_id, password)
-            deploy_task.link_error(
-                deploy_failed.s(driverCls, provider, identity, instance_id))
+    #Always deploy to the instance, but change what atmo-init does..
+    deploy_meta_task = update_metadata.si(
+        driverCls, provider, identity, instance_id,
+        {'tmp_status': 'deploying'})
+    deploy_task = _deploy_init_to.si(
+        driverCls, provider, identity, instance_id, password, redeploy)
+    deploy_task.link_error(
+        deploy_failed.s(driverCls, provider, identity, instance_id))
+    remove_status_task = update_metadata.si(
+            driverCls, provider, identity, instance_id,
+            {'tmp_status': ''})
 
-            remove_status_task = update_metadata.si(
-                    driverCls, provider, identity, instance_id,
-                    {'tmp_status': ''})
-
-            email_task = _send_instance_email.si(
-                    driverCls, provider, identity, instance_id)
-
-            floating_task.link(deploy_meta_task)
-            deploy_meta_task.link(deploy_task)
-            deploy_task.link(remove_status_task)
-            remove_status_task.link(email_task)
-        else:
-            logger.debug("Instance deployed, include email task")
-            email_task = _send_instance_email.si(
-                    driverCls, provider, identity, instance_id)
-            floating_task.link(email_task)
+    ## Link the chain below this line.
+    ##
+    if not instance.ip:
+        # Task will start with networking
+        # link networking to deploy..
+        start_chain = network_meta_task
+        network_meta_task.link(floating_task)
+        floating_task.link(deploy_meta_task)
     else:
-        if not deployed:
-            logger.debug("IP address available, deploy and email")
-            init_task = update_metadata.si(
-                    driverCls, provider, identity, instance_id,
-                    {'tmp_status': 'deploying'})
+        #Networking is ready, just deploy.
+        start_chain = deploy_meta_task
 
-            deploy_task = _deploy_init_to.si(
-                driverCls, provider, identity, instance_id, password,
-                link_error=deploy_failed.s(
-                    (driverCls, provider, identity, instance_id,)))
-
-            remove_status_task = update_metadata.si(
-                    driverCls, provider, identity, instance_id,
-                    {'tmp_status': ''})
-
-            init_task.link(deploy_task)
-            deploy_task.link(remove_status_task)
-        else:
-            logger.debug("IP address available, init deployed, just send email")
-            init_task = _send_instance_email.si(
-                    driverCls, provider, identity, instance_id)
-    return init_task
+    deploy_meta_task.link(deploy_task)
+    deploy_task.link(remove_status_task)
+    if not redeploy:
+        email_task = _send_instance_email.si(
+                driverCls, provider, identity, instance_id)
+        remove_status_task.link(email_task)
+    return start_chain
 
 
 @task(name="destroy_instance",
@@ -311,9 +337,10 @@ def destroy_instance(core_identity_id, instance_alias):
 
 @task(name="_deploy_init_to",
       default_retry_delay=32,
+      time_limit=30*60, #30minute hard-set time limit.
       max_retries=10)
-def _deploy_init_to(driverCls, provider, identity, instance_id, password=None,
-                    **celery_task_args):
+def _deploy_init_to(driverCls, provider, identity, instance_id,
+                    password=None, redeploy=False, **celery_task_args):
     try:
         logger.debug("_deploy_init_to task started at %s." % datetime.now())
         #Check if instance still exists
@@ -330,7 +357,7 @@ def _deploy_init_to(driverCls, provider, identity, instance_id, password=None,
         private_key = "/opt/dev/atmosphere/extras/ssh/id_rsa"
         kwargs.update({'ssh_key': private_key})
         kwargs.update({'timeout': 120})
-        msd = init(instance, identity.user.username, password)
+        msd = init(instance, identity.user.username, password, redeploy)
         kwargs.update({'deploy': msd})
         driver.deploy_to(instance, **kwargs)
         logger.debug("_deploy_init_to task finished at %s." % datetime.now())
@@ -368,7 +395,7 @@ def update_metadata(driverCls, provider, identity, instance_alias, metadata):
             driver, instance, data=metadata, replace=False)
         logger.debug("update_metadata task finished at %s." % datetime.now())
     except Exception as exc:
-        logger.warn(exc)
+        logger.exception(exc)
         update_metadata.retry(exc=exc)
 
 def eager_update_metadata(driver, instance, metadata):
@@ -412,7 +439,7 @@ def add_floating_ip(driverCls, provider, identity,
         #assign if instance doesn't already have an IP addr
         instance = driver.get_instance(instance_alias)
         if not instance:
-            logger.debug("Instance has been teminated: %s." % instance_id)
+            logger.debug("Instance has been teminated: %s." % instance_alias)
             return None
         floating_ips = driver._connection.neutron_list_ips(instance)
         if floating_ips:
@@ -430,9 +457,12 @@ def add_floating_ip(driverCls, provider, identity,
             r = regex.search(floating_ip)
             (one, two, three, four) = r.groups()
             hostname = "vm%s-%s.iplantcollaborative.org" % (three, four)
-            update_instance_metadata(driver, instance,
-                                     data={'public-hostname': hostname},
-                                     replace=False)
+        else:
+            # Find a way to convert new floating IPs to hostnames..
+            hostname = floating_ip
+        update_instance_metadata(driver, instance, data={
+            'public-hostname': hostname,
+            'public-ip':floating_ip}, replace=False)
 
         logger.info("Assigned IP:%s - Hostname:%s" % (floating_ip, hostname))
         #End
@@ -485,7 +515,6 @@ def add_os_project_network(core_identity, *args, **kwargs):
 
 @task(name="remove_empty_network",
       default_retry_delay=60,
-      ignore_result=True,
       max_retries=1)
 def remove_empty_network(
         driverCls, provider, identity,
@@ -510,7 +539,7 @@ def remove_empty_network(
                 break
         if not active_instances:
             inactive_instances = all(driver._is_inactive_instance(
-                instance for instance in instances))
+                instance) for instance in instances)
             #Inactive instances, True: Remove network, False
             remove_network = not inactive_instances
             #Check for project network
@@ -532,3 +561,112 @@ def remove_empty_network(
     except Exception as exc:
         logger.exception("Failed to check if project network is empty")
         remove_empty_network.retry(exc=exc)
+
+
+@task(name="check_image_membership")
+def check_image_membership():
+    try:
+        logger.debug("check_image_membership task started at %s." %
+                     datetime.now())
+        update_membership()
+        logger.debug("check_image_membership task finished at %s." %
+                     datetime.now())
+    except Exception as exc:
+        logger.exception('Error during check_image_membership task')
+        check_image_membership.retry(exc=exc)
+
+
+def update_membership():
+    from core.models import ApplicationMembership, Provider, ProviderMachine
+    from service.accounts.openstack import AccountDriver as OSAcctDriver
+    from service.accounts.eucalyptus import AccountDriver as EucaAcctDriver
+    for provider in Provider.objects.all():
+        if not provider.is_active():
+            return []
+        if provider.type.name.lower() == 'openstack':
+            driver = OSAcctDriver(provider)
+        else:
+            logger.warn("Encountered unknown ProviderType:%s, expected"
+                        " [Openstack]")
+            continue
+        images = driver.list_all_images()
+        changes = 0
+        for img in images:
+            pm = ProviderMachine.objects.filter(identifier=img.id,
+                                                provider=provider)
+            if not pm:
+                continue
+            app_manager = pm.application.applicationmembership_set
+            if img.is_public == False:
+                #Lookup members
+                image_members = accts.image_manager.shared_images_for(
+                        image_id=img.id)
+                #add machine to each member (Who owns the cred:ex_project_name) in MachineMembership
+                #for member in image_members:
+            else:
+                members = app_manager.all()
+                if members:
+                    logger.info("Application for PM:%s used to be private."
+                                " %s Users membership has been revoked. "
+                                % (img.id, len(members)))
+                    changes += len(members)
+                    members.delete()
+                #if MachineMembership exists, remove it (No longer private)
+    logger.info("Total Updates to machine membership:%s" % changes)
+    return changes
+
+
+def active_instances(instances):
+    tested_instances = {}
+    for instance in instances:
+        results = test_instance_links(instance.alias, instance.ip)
+        tested_instances.update(results)
+    return tested_instances
+
+
+def test_instance_links(alias, uri):
+    from rtwo.linktest import test_link
+    if uri is None:
+        return {alias: {'vnc': False, 'shell': False}}
+    shell_address = '%s/shell/%s/' % (settings.SERVER_URL, uri)
+    try:
+        shell_success = test_link(shell_address)
+    except Exception, e:
+        logger.exception("Bad shell address: %s" % shell_address)
+        shell_success = False
+    vnc_address = 'http://%s:5904' % uri
+    try:
+        vnc_success = test_link(vnc_address)
+    except Exception, e:
+        logger.exception("Bad vnc address: %s" % vnc_address)
+        vnc_success = False
+    return {alias: {'vnc': vnc_success, 'shell': shell_success}}
+
+
+def update_links(instances):
+    from core.models import Instance
+    updated = []
+    linktest_results = active_instances(instances)
+    for (instance_id, link_results) in linktest_results.items():
+        try:
+            update = False
+            instance = Instance.objects.get(provider_alias=instance_id)
+            if link_results['shell'] != instance.shell:
+                logger.debug('Change Instance %s shell %s-->%s' %
+                             (instance, instance.shell,
+                              link_results['shell']))
+                instance.shell = link_results['shell']
+                update = True
+            if link_results['vnc'] != instance.vnc:
+                logger.debug('Change Instance %s VNC %s-->%s' %
+                             (instance, instance.vnc,
+                              link_results['vnc']))
+                instance.vnc = link_results['vnc']
+                update = True
+            if update:
+                instance.save()
+                updated.append(instance)
+        except Instance.DoesNotExist:
+            continue
+    logger.debug("Instances updated: %d" % len(updated))
+    return updated

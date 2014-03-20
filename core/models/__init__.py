@@ -3,7 +3,7 @@ from core.models.identity import Identity
 from core.models.profile import UserProfile
 from core.models.provider import AccountProvider, ProviderType, PlatformType,\
     ProviderSize, Provider
-from core.models.machine import ProviderMachine
+from core.models.machine import ProviderMachine, ProviderMachineMembership
 from core.models.machine_request import MachineRequest
 from core.models.machine_export import MachineExport
 from core.models.maintenance import MaintenanceRecord
@@ -19,7 +19,8 @@ from core.models.group import Group, ProviderMembership, IdentityMembership,\
     InstanceMembership
 from core.models.allocation import Allocation
 from core.models.step import Step
-from core.models.application import Application, ApplicationMembership
+from core.models.application import Application, ApplicationMembership,\
+    ApplicationScore
 
 
 def get_or_create(Model, *args, **kwargs):

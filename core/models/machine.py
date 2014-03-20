@@ -40,6 +40,7 @@ class ProviderMachine(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
     version = VersionNumberField(default=int(VersionNumber(1,)))
 
+    
     def icon_url(self):
         return self.application.icon.url if self.application.icon else None
 
@@ -64,8 +65,9 @@ class ProviderMachine(models.Model):
 
     def esh_ownerid(self):
         if self.esh and self.esh._image\
-           and self.esh._image.extra:
-            return self.esh._image.extra.get('ownerid', "admin")
+           and self.esh._image.extra\
+           and self.esh._image.extra.get('metadata'):
+            return self.esh._image.extra['metadata'].get('application_owner', "admin")
 
     def esh_state(self):
         if self.esh and self.esh._image\
@@ -79,6 +81,25 @@ class ProviderMachine(models.Model):
     class Meta:
         db_table = "provider_machine"
         app_label = "core"
+class ProviderMachineMembership(models.Model):
+    """
+    Members of a specific image and provider combination.
+    Members can view & launch respective machines.
+    If the can_share flag is set, then members also have ownership--they can give
+    membership to other users.
+    The unique_together field ensures just one of those states is true.
+    """
+    provider_machine = models.ForeignKey(ProviderMachine)
+    group = models.ForeignKey('Group')
+    can_share = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return "(ProviderMachine:%s - Member:%s) " %\
+            (self.provider_machine.identifier, self.group.name)
+    class Meta:
+        db_table = 'provider_machine_membership'
+        app_label = 'core'
+        unique_together = ('provider_machine', 'group')
 
 
 def build_cached_machines():
@@ -145,8 +166,8 @@ def create_provider_machine(machine_name, provider_alias, provider_id, app, meta
         created_by = machine_owner.created_by,
         created_by_identity = machine_owner,
         identifier = provider_alias,
-        version = VersionNumber.string_to_version(
-            metadata.get('version','1.0')))
+        version = metadata.get('version',
+            VersionNumber.string_to_version('1.0')))
     logger.info("New ProviderMachine created: %s" % provider_machine)
     add_to_cache(provider_machine)
     return provider_machine
@@ -180,7 +201,10 @@ def convert_esh_machine(esh_driver, esh_machine, provider_id, image_id=None):
     elif not esh_machine:
         return None
     push_metadata = False
-    metadata = esh_machine._image.extra.get('metadata',{})
+    if not esh_machine._image:
+        metadata = {}
+    else:
+        metadata = esh_machine._image.extra.get('metadata',{})
     name = esh_machine.name
     alias = esh_machine.alias
 
@@ -209,6 +233,14 @@ def convert_esh_machine(esh_driver, esh_machine, provider_id, image_id=None):
             app = create_application(alias, provider_id, name)
     provider_machine = load_provider_machine(alias, name, provider_id,
                                              app=app, metadata=metadata)
+
+    #If names conflict between OpenStack and Database, choose OpenStack.
+    if esh_machine._image and app.name != name:
+        logger.debug("Name Conflict! Machine %s named %s, Application named %s"
+                     % (alias, name, app.name))
+        app.name = name
+        app.save()
+
     #if push_metadata and hasattr(esh_driver._connection,
     #                             'ex_set_image_metadata'):
     #    logger.debug("Creating App data for Image %s:%s" % (alias, app.name))
@@ -237,17 +269,33 @@ def compare_core_machines(mach_1, mach_2):
     else:
         return cmp(mach_1.identifier, mach_2.identifier)
 
-def filter_core_machine(provider_machine):
+def filter_core_machine(provider_machine, request_user=None):
     """
     Filter conditions:
     * Application does not have an end_date
     * end_date < now
     """
     now = timezone.now()
+    #Ignore end dated providers
     if provider_machine.end_date or\
        provider_machine.application.end_date:
         if provider_machine.end_date:
             return not(provider_machine.end_date < now)
         if provider_machine.application.end_date:
             return not(provider_machine.application.end_date < now)
+    #Ignore public users accessing private images..
+    #if provider_machine.application.private:
+    #    if request_user:
+    #        allowed_groups = [m.group for m in
+    #                          provider_machine.providermachinemembership_set.all()]
+    #        print "%s can be launched by:%s" \
+    #                     % (provider_machine, allowed_groups)
+    #        for group in allowed_groups:
+    #            allowed_users = [u.username for u in group.user_set.all()]
+    #            if request_user in allowed_users:
+    #                print "%s is allowed to use %s" % (request_user, provider_machine.identifier)
+    #                return True
+    #    print "%s is not allowed to use %s" % (request_user, provider_machine.identifier)
+    #    return False
+    #print "%s is not a private image" % (provider_machine.identifier)
     return True

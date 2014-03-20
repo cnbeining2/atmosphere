@@ -3,6 +3,7 @@ Service Provider model for atmosphere.
 """
 
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from rtwo.provider import AWSProvider, EucaProvider, OSProvider
@@ -14,7 +15,7 @@ class PlatformType(models.Model):
     Keep track of Virtualization Platform via type
     """
     name = models.CharField(max_length=256)
-    start_date = models.DateTimeField(default=timezone.now())
+    start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(null=True, blank=True)
 
     def json(self):
@@ -34,7 +35,7 @@ class ProviderType(models.Model):
     Keep track of Provider via type
     """
     name = models.CharField(max_length=256)
-    start_date = models.DateTimeField(default=timezone.now())
+    start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(null=True, blank=True)
 
     def json(self):
@@ -95,6 +96,22 @@ class Provider(models.Model):
     public = models.BooleanField(default=False)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(blank=True, null=True)
+
+    @classmethod
+    def get_active(cls, provider_id=None, type_name=None):
+        """
+        Get the provider if it's active, otherwise raise
+        Provider.DoesNotExist.
+        """
+        active_providers =  cls.objects.filter(
+            Q(end_date=None) | Q(end_date__gt=timezone.now()),
+            active=True)
+        if type_name:
+            active_providers = active_providers.filter(type__name__iexact=type_name)
+        if provider_id:
+            # no longer a list
+            active_providers = active_providers.get(id=provider_id)
+        return active_providers
 
     def share(self, core_group):
         """
@@ -224,4 +241,3 @@ class AccountProvider(models.Model):
     class Meta:
         db_table = 'provider_admin'
         app_label = 'core'
-

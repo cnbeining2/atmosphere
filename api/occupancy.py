@@ -2,6 +2,8 @@
 atmosphere service provider occupancy rest api.
 
 """
+from django.utils import timezone
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -28,12 +30,16 @@ class Occupancy(APIView):
         """
         #Get meta for provider to call occupancy
         try:
-            provider = Provider.objects.get(id=provider_id)
+            provider = Provider.get_active(provider_id)
         except Provider.DoesNotExist:
             return failure_response(
                 status.HTTP_404_NOT_FOUND,
                 "The provider does not exist.")
         admin_driver = get_admin_driver(provider)
+        if not admin_driver:
+            return failure_response(
+                status.HTTP_404_NOT_FOUND,
+                "The driver cannot be retrieved for this provider.")
         meta_driver = admin_driver.meta(admin_driver=admin_driver)
         esh_size_list = meta_driver.occupancy()
         core_size_list = [convert_esh_size(size, provider_id)
@@ -50,12 +56,16 @@ class Hypervisor(APIView):
     @api_auth_token_required
     def get(self, request, provider_id):
         try:
-            provider = Provider.objects.get(id=provider_id)
+            provider = Provider.get_active(provider_id)
         except Provider.DoesNotExist:
             return failure_response(
                 status.HTTP_404_NOT_FOUND,
                 "The provider does not exist.")
         admin_driver = get_admin_driver(provider)
+        if not admin_driver:
+            return failure_response(
+                status.HTTP_404_NOT_FOUND,
+                "The driver cannot be retrieved for this provider.")
         if hasattr(admin_driver._connection, "ex_hypervisor_statistics"):
             return Response(
                 admin_driver._connection.ex_hypervisor_statistics())

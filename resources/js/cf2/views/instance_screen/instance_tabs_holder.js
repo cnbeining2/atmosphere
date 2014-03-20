@@ -286,7 +286,7 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 
 			this.$el.find('#euca_controls').fadeIn('fast');
 		}
-
+	this.$el.find('.reboot_instance_btn').addClass('disabled').attr('disabled', 'disabled');
         this.display_graph();
 
 		// Shutting-down/terminted instances should have terminate button disabled
@@ -626,12 +626,8 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 					if (Atmo.profile.get('selected_identity').get('provider_id') == 1)
 						Atmo.Utils.notify("Reboot Successful", "Your instance has successfully performed a soft reboot.");
 				}, 
-				error: function() {
-					Atmo.Utils.notify(
-						'Could not reboot instance', 
-						'If the problem persists, please contact <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', 
-						{ no_timeout: true }
-					);
+				error: function(request,model,error) {
+				  Atmo.Utils.notifyErrors(request,'Could not reboot instance for the following reason(s):');					
 				}
 			});
 		};
@@ -683,16 +679,12 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 						success: function() {
 							Atmo.instances.update();
 						},
-						error: function() {
-							self.model.set({state: 'suspended',
+						error: function(request, status, error) {
+						   self.model.set({state: 'suspended',
 											state_is_build: false,
 											state_is_inactive: true});
 
-							Atmo.Utils.notify(
-								'Could not resume instance', 
-								'If the problem persists, please contact <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', 
-								{ no_timeout: true }
-							);
+						  Atmo.Utils.notifyErrors(request,'You could not resume your instance for the following reason(s):');
 						}
 					});
 				};
@@ -707,7 +699,8 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 			header = 'Suspend Instance';
 			body = '<p class="alert alert-error"><i class="glyphicon glyphicon-warning-sign"></i> <strong>WARNING</strong> '
 				+ 'Suspending an instance will freeze its state, and the IP address may change when you resume the instance.</p>'
-				+ 'Suspending an instance frees up resources for other users and allows you to safely preserve the state of your instance without imaging.'
+				+ 'Suspending an instance frees up resources for other users and allows you to safely preserve the state of your instance without imaging. '
+				+ 'Your time allocation no longer counts against you in the suspended mode.'
 				+ '<br><br>'
 				+ 'Your resource usage charts will only reflect the freed resources once the instance\'s state is "suspended."';
 			ok_button = 'Suspend Instance';
@@ -723,13 +716,9 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 						// Merges models to those that are accurate based on server response
 						Atmo.instances.update();
 					}, 
-					error: function() {
-						self.model.set({ state_is_active: true, state_is_build: false });
-						Atmo.Utils.notify(
-							'Could not suspend instance', 
-							'If the problem persists, please contact <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', 
-							{ no_timeout: true }
-						);
+					error: function(request,status,error) {
+					  self.model.set({ state_is_active: true, state_is_build: false });
+					  Atmo.Utils.notifyErrors(request, 'You could not suspend your instance for the following reason(s):');
 					}
 				});
 			};
@@ -781,15 +770,11 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 							// Merges models to those that are accurate based on server response
 							Atmo.instances.update();
 						}, 
-						error: function() {
+						error: function(request, status, error) {
 							self.model.set({state: 'shutoff',
 											state_is_build: false,
 											state_is_inactive: true});
-							Atmo.Utils.notify(
-								'Could not start instance', 
-								'If the problem persists, please contact <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', 
-								{ no_timeout: true }
-							);
+							Atmo.Utils.notifyErrors(request,'Coult not start instance for the following reason(s):');
 						}
 					});
 				};
@@ -802,7 +787,7 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 		}
 		else {
 			header = 'Stop Instance';
-			body = 'Your instance will be stopped.';
+			body = 'Your instance will be stopped.<br /><br/><strong>NOTE:</strong> This will NOT affect your resources. To preserve resources and time allocation you must Suspend your instance.';
 			ok_button = 'Stop Instance';
 			data = { "action" : "stop" };
 			on_confirm = function() {
@@ -816,12 +801,8 @@ Atmo.Views.InstanceTabsHolder = Backbone.View.extend({
 						// Merges models to those that are accurate based on server response
 						Atmo.instances.update();
 					},
-					error: function() {
-						Atmo.Utils.notify(
-							'Could not stop instance', 
-							'If the problem persists, please contact <a href="mailto:support@iplantcollaborative.org">support@iplantcollaborative.org</a>', 
-							{ no_timeout: true }
-						);
+					error: function(request, status, error) {
+					   Atmo.Utils.notifyErrors(request, 'Could not stop instance for the following error(s):');	
 					}
 				});
 			};
