@@ -102,6 +102,7 @@ ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE/jenkins
         Allow from all
     </Location>
 
+    Alias /static/rest_framework LOCATIONOFATMOSPHEREHERE/static/rest_framework
     Alias /static LOCATIONOFTROPOSPHEREHERE/troposphere/assets
     ProxyPass /application http://localhost:5000/application
     ProxyPassReverse /application http://localhost:5000/application
