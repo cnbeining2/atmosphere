@@ -21,7 +21,6 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, '/opt/env/atmo/lib/python2.7/site-packages/')
 sys.path.insert(1, root_dir)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "atmosphere.settings")
 #LIBCLOUD_DEBUG = os.path.abspath(os.path.join(
 #    root_dir,
 #    'logs/libcloud.log'))
@@ -30,12 +29,15 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "atmosphere.settings")
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
-from django.core.wsgi import get_wsgi_application
-try:
-    application = get_wsgi_application()
-except Exception, e:
-    e.msg = os.path.dirname(__file__)
-    raise e
+def application(environ, start_response):
+    os.environ['DJANGO_SETTINGS_MODULE'] = environ['DJANGO_SETTINGS_MODULE']
+    from django.core.wsgi import get_wsgi_application
+    try:
+        _application = get_wsgi_application()
+    except Exception, e:
+        e.msg = os.path.dirname(__file__)
+        raise e
+    return _application(environ, start_response)
 
 #from helloworld.wsgi import HelloWorldApplication
 #application = HelloWorldApplication(application)
