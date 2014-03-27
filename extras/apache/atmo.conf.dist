@@ -1,28 +1,24 @@
-###
-### HTTP Virtual Host Context
-###
-
+###############################################################################
+## HTTP Virtual Host Context (Forwards requests to HTTPS)
+###############################################################################
 <VirtualHost *:80>
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	LogLevel warn
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-        RewriteEngine On
-        RewriteCond %{HTTPS} !=on
-        RewriteRule ^/?(.*) https://MYHOSTNAMEHERE/$1 [R,L]
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^/?(.*) https://MYHOSTNAMEHERE/$1 [R,L]
 </VirtualHost>
 
-###
-### WSGI Configuration
-###
-
-WSGIPythonHome VIRTUALENVHERE
-
+###############################################################################
+## SSL Configuration
+###############################################################################
 SSLCryptoDevice builtin
 
-##
+###############################################################################
 ## Celery-Flower proxy redirection
-##
+###############################################################################
 ProxyRequests Off
 ProxyPreserveHost On
 SSLProxyEngine On
@@ -36,9 +32,9 @@ ProxyPassReverse  /flower  https://MYHOSTNAMEHERE/flower
   Allow from all
 </Proxy>
 
-##
+###############################################################################
 ## Jenkins proxy redirection
-##
+###############################################################################
 ProxyPass         /jenkins  http://MYHOSTNAMEHERE:8080/jenkins
 ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE:8080/jenkins
 ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE/jenkins
@@ -47,71 +43,78 @@ ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE/jenkins
   Order deny,allow
   Allow from all
 </Proxy>
-##
-## SSL Virtual Host Context
-##
 
-<VirtualHost _default_:443>
+###############################################################################
+## HTTPS (Port 443) Virtualhost Configuration
+###############################################################################
+<VirtualHost *:443>
+  
+    # Rewrite
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+    # for the old domain
+    RewriteCond %{HTTP_HOST} ^MYHOSTNAMEHERE$
+    RewriteRule ^/(.*)$       https://MYHOSTNAMEHERE/$1 [R,L]
+  
+    # SSL Settings
+    SSLEngine on
+    SSLProtocol all -SSLv2
+    SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
+    SSLCertificateFile /etc/ssl/certs/BASECERTHERE
+    SSLCertificateKeyFile /etc/ssl/private/KEYHERE
+    SSLCertificateChainFile /etc/ssl/certs/BUNDLECERTHERE
+  
+    <Files ~ "\.(cgi|shtml|phtml|php3?)$">
+        SSLOptions +StdEnvVars
+    </Files>
+    <Directory "/var/www/cgi-bin">
+        SSLOptions +StdEnvVars
+    </Directory>
+  
+    SetEnvIf User-Agent ".*MSIE.*" \
+             nokeepalive ssl-unclean-shutdown \
+             downgrade-1.0 force-response-1.0
+  
+    # Proxy settings
+    RewriteEngine On
+    # Rules to redirect to atmosphere API
+    RewriteRule ^/api/(.*)$       http://localhost:8444/api/$1 [P]
+    # Rules to redirect to troposphere--web client
+    RewriteRule ^/(.*)$       http://localhost:5000/$1 [P]
+</VirtualHost>
 
-#Rewrite
-RewriteEngine On
-RewriteCond %{HTTP:Authorization} ^(.*)
-RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+###############################################################################
+## Atmosphere Server Virtualhost (Port 8444)
+###############################################################################
+Listen 8444
+<VirtualHost *:8444>
 
-#for the old domain
-RewriteCond %{HTTP_HOST} ^MYHOSTNAMEHERE$
-RewriteRule ^/(.*)$       https://MYHOSTNAMEHERE/$1 [R,L]
+    SetEnv DJANGO_SETTINGS_MODULE atmosphere.settings
 
-#Logging
-ErrorLog /var/log/apache2/ssl_error.log
-TransferLog /var/log/apache2/ssl_access.log
-LogLevel warn
+    # Logging
+    ErrorLog /var/log/apache2/ssl_error.log
+    TransferLog /var/log/apache2/ssl_access.log
+    LogLevel warn
 
+    # Catch static file paths
+    # favicon and robots are better served outside of WSGI
+    Alias /favicon.ico LOCATIONOFATMOSPHEREHERE/static/images/favicon.ico
+    Alias /robots.txt LOCATIONOFATMOSPHEREHERE/templates/robots.txt
+    #init_files && resources will auto-direct to the file
+    Alias /init_files LOCATIONOFATMOSPHEREHERE/init_files
+    Alias /resources LOCATIONOFATMOSPHEREHERE/resources
+    #Assing WSGI to any other folder
+    WSGIScriptAlias / LOCATIONOFATMOSPHEREHERE/atmosphere/wsgi.py
 
-#SSL
-SSLEngine on
-SSLProtocol all -SSLv2
-SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
-SSLCertificateFile /etc/ssl/certs/BASECERTHERE
-SSLCertificateKeyFile /etc/ssl/private/KEYHERE
-SSLCertificateChainFile /etc/ssl/certs/BUNDLECERTHERE
-
-<Files ~ "\.(cgi|shtml|phtml|php3?)$">
-    SSLOptions +StdEnvVars
-</Files>
-<Directory "/var/www/cgi-bin">
-    SSLOptions +StdEnvVars
-</Directory>
-
-SetEnvIf User-Agent ".*MSIE.*" \
-         nokeepalive ssl-unclean-shutdown \
-         downgrade-1.0 force-response-1.0
-
-
-#This is for atmosphere
-Alias /favicon.ico LOCATIONOFATMOSPHEREHERE/static/images/favicon.ico
-Alias /robots.txt LOCATIONOFATMOSPHEREHERE/templates/robots.txt
-#init_files && resources will auto-direct to the file
-Alias /init_files LOCATIONOFATMOSPHEREHERE/init_files
-Alias /resources LOCATIONOFATMOSPHEREHERE/resources
-Alias /static LOCATIONOFATMOSPHEREHERE/static
-
-#Assing WSGI to any other folder
-WSGIScriptAlias / LOCATIONOFATMOSPHEREHERE/atmosphere/wsgi.py
-
-#Notifications
-<Location /n/>
-          ProxyPass http://localhost:9000/
-</Location>
-
-# Shell
-<Location /shell>
-    AuthType CAS
-    AuthName "CAS"
-    require valid-user
-    CASScope /
-    Order allow,deny
-    Allow from all
-</Location>
+    # Shell
+    <Location /shell>
+        AuthType CAS
+        AuthName "CAS"
+        require valid-user
+        CASScope /
+        Order allow,deny
+        Allow from all
+    </Location>
 
 </VirtualHost>
