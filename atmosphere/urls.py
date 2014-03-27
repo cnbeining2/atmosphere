@@ -8,7 +8,7 @@ from django.conf.urls import patterns, url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from api.accounts import Account
-from api.application import ApplicationList
+from api.application import ApplicationList, Application
 from api.email import Feedback, QuotaEmail, SupportEmail
 from api.flow import Flow
 from api.group import GroupList, Group
@@ -25,6 +25,7 @@ from api.maintenance import MaintenanceRecordList, MaintenanceRecord
 from api.meta import Meta, MetaAction
 from api.notification import NotificationList
 from api.occupancy import Occupancy, Hypervisor
+from api.project import Project
 from api.profile import Profile
 from api.provider import ProviderList, Provider
 from api.size import SizeList, Size
@@ -106,6 +107,9 @@ urlpatterns += format_suffix_patterns(patterns(
     url(r'^api/v1/email_support', SupportEmail.as_view()),
     url(r'^api/v1/request_quota/$', QuotaEmail.as_view()),
 
+
+    # v1 of The atmosphere API 
+    url(r'api/v1/project/$', Project.as_view()),
     url(r'api/v1/version/$', Version.as_view()),
     url(r'^api/v1/maintenance/$',
         MaintenanceRecordList.as_view(),
@@ -132,6 +136,10 @@ urlpatterns += format_suffix_patterns(patterns(
     url(r'^api/v1/application/$',
         ApplicationList.as_view(),
         name='application-list'),
+
+    url(r'^api/v1/application/(?P<app_uuid>[a-zA-Z0-9-]+)/$',
+        Application.as_view(),
+        name='application-detail'),
 
     url(r'^api/v1/instance/$', InstanceHistory.as_view(),
         name='instance-history'),
@@ -226,11 +234,12 @@ urlpatterns += format_suffix_patterns(patterns(
     url(r'^api/v1/provider/(?P<provider_id>\d+)'
         + '/identity/(?P<identity_id>\d+)/machine/(?P<machine_id>[a-zA-Z0-9-]+)/$',
         Machine.as_view(), name='machine-detail'),
-    url(r'^api/v1/provider/(?P<provider_id>\d+)'
-        + '/identity/(?P<identity_id>\d+)'
-        + '/machine/(?P<machine_id>[a-zA-Z0-9-]+)'
-        + '/vote/$',
-        MachineVote.as_view(), name='machine-vote'),
+    #TODO: Uncomment when 'voting' feature is ready.
+    #url(r'^api/v1/provider/(?P<provider_id>\d+)'
+    #    + '/identity/(?P<identity_id>\d+)'
+    #    + '/machine/(?P<machine_id>[a-zA-Z0-9-]+)'
+    #    + '/vote/$',
+    #    MachineVote.as_view(), name='machine-vote'),
 
 
     url(r'^api/v1/provider/(?P<provider_id>\d+)'
