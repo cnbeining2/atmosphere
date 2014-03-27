@@ -48,7 +48,6 @@ ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE/jenkins
 ## HTTPS (Port 443) Virtualhost Configuration
 ###############################################################################
 <VirtualHost *:443>
-  
     # Rewrite
     RewriteEngine On
     RewriteCond %{HTTP:Authorization} ^(.*)
@@ -75,20 +74,6 @@ ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE/jenkins
     SetEnvIf User-Agent ".*MSIE.*" \
              nokeepalive ssl-unclean-shutdown \
              downgrade-1.0 force-response-1.0
-  
-    # Proxy settings
-    RewriteEngine On
-    # Rules to redirect to atmosphere API
-    RewriteRule ^/api/(.*)$       http://localhost:8444/api/$1 [P]
-    # Rules to redirect to troposphere--web client
-    RewriteRule ^/(.*)$       http://localhost:5000/$1 [P]
-</VirtualHost>
-
-###############################################################################
-## Atmosphere Server Virtualhost (Port 8444)
-###############################################################################
-Listen 8444
-<VirtualHost *:8444>
 
     SetEnv DJANGO_SETTINGS_MODULE atmosphere.settings
 
@@ -116,5 +101,11 @@ Listen 8444
         Order allow,deny
         Allow from all
     </Location>
+
+    Alias /static LOCATIONOFTROPOSPHEREHERE/troposphere/assets
+    ProxyPass /application http://localhost:5000/application
+    ProxyPassReverse /application http://localhost:5000/application
+    ProxyPass /cas/service http://localhost:5000/cas/service
+    ProxyPassReverse /cas/service http://localhost:5000/cas/service
 
 </VirtualHost>
