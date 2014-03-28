@@ -103,10 +103,19 @@ ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE/jenkins
     </Location>
 
     Alias /static/rest_framework LOCATIONOFATMOSPHEREHERE/static/rest_framework
+
+    # The following URLs are proxied to Troposphere:
+    # /, /static, /applicaiton, /login, /logout, /cas/service
     Alias /static LOCATIONOFTROPOSPHEREHERE/troposphere/assets
     ProxyPass /application http://localhost:5000/application
     ProxyPassReverse /application http://localhost:5000/application
+    ProxyPass /login http://localhost:5000/login
+    ProxyPassReverse /login http://localhost:5000/login
+    ProxyPass /logout http://localhost:5000/logout
+    ProxyPassReverse /logout http://localhost:5000/logout
     ProxyPass /cas/service http://localhost:5000/cas/service
     ProxyPassReverse /cas/service http://localhost:5000/cas/service
+    ProxyPassMatch ^/$ http://localhost:5000
+    ProxyPassReverse / http://localhost:5000
 
 </VirtualHost>
