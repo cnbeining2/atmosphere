@@ -115,6 +115,8 @@ ProxyPassReverse  /jenkins  http://MYHOSTNAMEHERE/jenkins
     ProxyPassReverse /logout http://localhost:5000/logout
     ProxyPass /cas/service http://localhost:5000/cas/service
     ProxyPassReverse /cas/service http://localhost:5000/cas/service
+    ProxyPass /forbidden http://localhost:5000/forbidden
+    ProxyPassReverse /forbidden http://localhost:5000/forbidden
     ProxyPassMatch ^/$ http://localhost:5000
     ProxyPassReverse / http://localhost:5000
 
