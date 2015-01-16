@@ -13,8 +13,7 @@ from api.application import ApplicationList #,ApplicationSearch, Application
 # from api.flow import Flow
 # from api.group import GroupList, Group
 # from api.identity_membership import IdentityMembershipList, IdentityMembership
-# from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
-from api.identity import IdentityList, IdentityDetail, IdentityDetailList
+from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
 # from api.instance import InstanceList, Instance,\
 #     InstanceAction, InstanceHistory, InstanceHistoryDetail,\
 #     InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
@@ -268,7 +267,7 @@ public_apis = format_suffix_patterns(patterns(
 
 
     url(provider_specific + r'/identity$', IdentityList.as_view(), name='identity-list'),
-    # url(identity_specific + r'$', Identity.as_view(), name='identity-detail'),
+    url(identity_specific + r'$', Identity.as_view(), name='identity-detail'),
 
 
     url(r'^identity$', IdentityDetailList.as_view(), name='identity-detail-list'),
