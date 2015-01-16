@@ -9,7 +9,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 # from api.accounts import Account
 from api.application import ApplicationList #,ApplicationSearch, Application
 # from api.bookmark import  ApplicationBookmarkDetail, ApplicationBookmarkList
-# from api.email import Feedback, QuotaEmail, SupportEmail
+from api.email import Feedback, QuotaEmail, SupportEmail
 # from api.flow import Flow
 # from api.group import GroupList, Group
 # from api.identity_membership import IdentityMembershipList, IdentityMembership
@@ -55,12 +55,12 @@ provider_specific = r"^provider/(?P<provider_id>\d+)"
 identity_specific = provider_specific + r"/identity/(?P<identity_id>\d+)"
 user_match = "[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*)"
 
-# private_apis = patterns('',
+private_apis = patterns('',
 #     # E-mail API
-#     url(r'^email/feedback', Feedback.as_view()),
-#     url(r'^email/support', SupportEmail.as_view()),
-#     url(r'^email/request_quota$', QuotaEmail.as_view()),
-#
+    url(r'^email/feedback', Feedback.as_view()),
+    url(r'^email/support', SupportEmail.as_view()),
+    url(r'^email/request_quota$', QuotaEmail.as_view()),
+
 #     # TODO: Deprecate this if it isn't going to be used.
 #     # instance service (Calls from within the instance)
 #     url(r'^instancequery/', 'web.views.ip_request'),
@@ -180,7 +180,7 @@ user_match = "[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*)"
 #         IdentityMembershipList.as_view(), name='identity-membership-list'),
 #     url(identity_specific + r'/members/(?P<group_name>(%s)$' % user_match,
 #         IdentityMembership.as_view(), name='identity-membership-detail'),
-# )
+)
 
 public_apis = format_suffix_patterns(patterns(
     '',
@@ -295,10 +295,10 @@ public_apis = format_suffix_patterns(patterns(
 
 ))
 
-# urlpatterns = patterns('',
-#         url(r'^', include(private_apis,namespace="private_apis")))
-
 urlpatterns = patterns('',
+        url(r'^', include(private_apis,namespace="private_apis")))
+
+urlpatterns += patterns('',
         url(r'^', include(public_apis,namespace="public_apis")))
 
 
