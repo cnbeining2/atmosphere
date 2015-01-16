@@ -231,14 +231,14 @@ class TagRelatedField(serializers.SlugRelatedField):
 #     #TODO: Define a spec that we expect from list_users across all providers
 #
 #
-# class ProviderSerializer(serializers.ModelSerializer):
-#     type = serializers.SlugRelatedField(slug_field='name')
-#     location = serializers.CharField(source='get_location')
-#     #membership = serializers.Field(source='get_membership')
-#
-#     class Meta:
-#         model = Provider
-#         exclude = ('active', 'start_date', 'end_date')
+    # class ProviderSerializer(serializers.ModelSerializer):
+    #     type = serializers.SlugRelatedField(slug_field='name')
+    #     location = serializers.CharField(source='get_location')
+    #     #membership = serializers.Field(source='get_membership')
+    #
+    #     class Meta:
+    #         model = Provider
+    #         exclude = ('active', 'start_date', 'end_date')
 #
 #
 # class CleanedIdentitySerializer(serializers.ModelSerializer):

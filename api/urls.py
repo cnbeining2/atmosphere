@@ -33,7 +33,7 @@ from api.maintenance import MaintenanceRecordList #, MaintenanceRecord
 #         ProjectApplicationList, ProjectApplicationExchange,\
 #         ProjectVolumeList, ProjectVolumeExchange
 # from api.profile import Profile
-# from api.provider import ProviderList, Provider
+from api.provider import ProviderList #, Provider
 # from api.size import SizeList, Size
 # from api.hypervisor import HypervisorList, HypervisorDetail
 # from api.step import StepList, Step
@@ -184,24 +184,29 @@ from authentication.decorators import atmo_valid_token_required
 public_apis = format_suffix_patterns(patterns(
     '',
     # url(r'^profile$', Profile.as_view(), name='profile'),
-    #
+
+
     # url(r'^group$', GroupList.as_view(), name='group-list'),
     # url(r'^group/(?P<groupname>.*)$', Group.as_view()),
+
 
     url(r'^tag$', TagList.as_view(), name='tag-list'),
     url(r'^tag/(?P<tag_slug>.*)$', Tag.as_view()),
 
+
     url(r'^application$',
         ApplicationList.as_view(),
         name='application-list'),
-    #
+
+
     # url(r'^application/search$',
     #     ApplicationSearch.as_view(),
     #     name='application-search'),
     # url(r'^application/(?P<app_uuid>[a-zA-Z0-9-]+)$',
     #     Application.as_view(),
     #     name='application-detail'),
-    #
+
+
     # url(r'^instance_history$', InstanceHistory.as_view(),
     #     name='instance-history'),
     # url(r'^instance_history/'
@@ -211,7 +216,8 @@ public_apis = format_suffix_patterns(patterns(
     #     '(?P<instance_id>[a-zA-Z0-9-]+)/'
     #     'status_history$', InstanceStatusHistoryDetail.as_view(),
     #     name='instance-history'),
-    #
+
+
     # url(identity_specific + r'/instance/'
     #     + '(?P<instance_id>[a-za-z0-9-]+)/tag$',
     #     InstanceTagList.as_view(), name='instance-tag-list'),
@@ -225,25 +231,28 @@ public_apis = format_suffix_patterns(patterns(
     #     Instance.as_view(), name='instance-detail'),
     # url(identity_specific + r'/instance$',
     #     InstanceList.as_view(), name='instance-list'),
-    #
+
+
     # url(identity_specific + r'/size$',
     #     SizeList.as_view(), name='size-list'),
     # url(identity_specific + r'/size/(?P<size_id>\d+)$',
     #     Size.as_view(), name='size-detail'),
-    #
-    #
+
+
     # url(identity_specific + r'/volume$',
     #     VolumeList.as_view(), name='volume-list'),
     # url(identity_specific + r'/volume/(?P<volume_id>[a-zA-Z0-9-]+)$',
     #     Volume.as_view(), name='volume-detail'),
     # url(identity_specific + r'/boot_volume(?P<volume_id>[a-zA-Z0-9-]+)?$',
     #     BootVolume.as_view(), name='boot-volume'),
-    #
+
+
     # url(identity_specific + r'/volume_snapshot$',
     #     VolumeSnapshot.as_view(), name='volume-snapshot'),
     # url(identity_specific + r'/volume_snapshot/(?P<snapshot_id>[a-zA-Z0-9-]+)$',
     #     VolumeSnapshotDetail.as_view(), name='volume-snapshot-detail'),
-    #
+
+
     # url(identity_specific + r'/machine$',
     #     MachineList.as_view(), name='machine-list'),
     # url(identity_specific + r'/machine/history$',
@@ -254,28 +263,30 @@ public_apis = format_suffix_patterns(patterns(
     #     Machine.as_view(), name='machine-detail'),
     # url(identity_specific + r'/machine/(?P<machine_id>[a-zA-Z0-9-]+)'
     #     + '/icon$', MachineIcon.as_view(), name='machine-icon'),
-    #
+
+
     # url(provider_specific + r'/identity$', IdentityList.as_view(), name='identity-list'),
     # url(identity_specific + r'$', Identity.as_view(), name='identity-detail'),
-    #
+
+
     # url(r'^identity$', IdentityDetailList.as_view(),
     #     name='identity-detail-list'),
     # url(r'^identity/(?P<identity_id>\d+)$', IdentityDetail.as_view(),
     #     name='identity-detail-list'),
-    # url(r'^provider$', ProviderList.as_view(), name='provider-list'),
+    url(r'^provider$', ProviderList.as_view(), name='provider-list'),
     # url(r'^provider/(?P<provider_id>\d+)$',
     #     Provider.as_view(), name='provider-detail'),
-    #
-    #
+
+
     # url(identity_specific + r'/request_image$',
     #     MachineRequestList.as_view(), name='machine-request-list'),
     # url(identity_specific + r'/request_image/(?P<machine_request_id>\d+)$',
     #     MachineRequest.as_view(), name='machine-request'),
-    #
-    #
+
+
     # url(identity_specific + r'/profile$',
     #     Profile.as_view(), name='profile-detail'),
-    #
+
     url(r'version$', Version.as_view()),
     url(r'^maintenance$',
         MaintenanceRecordList.as_view(),
