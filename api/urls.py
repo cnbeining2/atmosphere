@@ -40,7 +40,7 @@ from api.application import ApplicationList #,ApplicationSearch, Application
 from api.tag import TagList, Tag
 # from api.token import TokenEmulate
 # from api.user import UserManagement, User
-# from api.version import Version
+from api.version import Version
 # from api.volume import BootVolume, \
 #         VolumeSnapshot, VolumeSnapshotDetail, \
 #         VolumeList, Volume
@@ -276,7 +276,7 @@ public_apis = format_suffix_patterns(patterns(
     # url(identity_specific + r'/profile$',
     #     Profile.as_view(), name='profile-detail'),
     #
-    # url(r'version$', Version.as_view()),
+    url(r'version$', Version.as_view()),
     # url(r'^maintenance$',
     #     MaintenanceRecordList.as_view(),
     #     name='maintenance-record-list'),
