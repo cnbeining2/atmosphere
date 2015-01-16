@@ -17,8 +17,7 @@ from service.search import search, CoreApplicationSearch
 
 from api import failure_response
 from api.permissions import InMaintenance, ApiAuthOptional
-from api.serializers import \
-    ApplicationSerializer, PaginatedApplicationSerializer
+from api.serializers import ApplicationSerializer, PaginatedApplicationSerializer
 
 def _filter_applications(applications, user, params):
     #Filter the list based on query strings

@@ -7,7 +7,7 @@ from django.conf.urls import patterns, url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 
 # from api.accounts import Account
-# from api.application import ApplicationSearch, ApplicationList, Application
+from api.application import ApplicationList #,ApplicationSearch, Application
 # from api.bookmark import  ApplicationBookmarkDetail, ApplicationBookmarkList
 # from api.email import Feedback, QuotaEmail, SupportEmail
 # from api.flow import Flow
@@ -191,9 +191,9 @@ public_apis = format_suffix_patterns(patterns(
     url(r'^tag$', TagList.as_view(), name='tag-list'),
     url(r'^tag/(?P<tag_slug>.*)$', Tag.as_view()),
 
-    # url(r'^application$',
-    #     ApplicationList.as_view(),
-    #     name='application-list'),
+    url(r'^application$',
+        ApplicationList.as_view(),
+        name='application-list'),
     #
     # url(r'^application/search$',
     #     ApplicationSearch.as_view(),
