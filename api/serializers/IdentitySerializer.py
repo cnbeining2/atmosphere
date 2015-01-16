@@ -3,11 +3,11 @@ from core.models import Identity
 
 
 class IdentitySerializer(serializers.ModelSerializer):
-    created_by = serializers.CharField(source='creator_name')
-    credentials = serializers.Field(source='get_credentials')
-    quota = serializers.Field(source='get_quota_dict')
-    membership = serializers.Field(source='get_membership')
+    # created_by = serializers.CharField(source='creator_name')
+    # credentials = serializers.ReadOnlyField(source='get_credentials')
+    quota = serializers.ReadOnlyField(source='get_quota_dict')
+    # membership = serializers.ReadOnlyField(source='get_membership')
 
     class Meta:
         model = Identity
-        fields = ('id', 'created_by', 'provider', 'credentials', 'quota', 'membership')
+        fields = ('id', 'provider', 'quota')

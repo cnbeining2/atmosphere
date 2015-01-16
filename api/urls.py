@@ -14,7 +14,7 @@ from api.application import ApplicationList #,ApplicationSearch, Application
 # from api.group import GroupList, Group
 # from api.identity_membership import IdentityMembershipList, IdentityMembership
 # from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
-from api.identity import IdentityDetail, IdentityDetailList
+from api.identity import IdentityList, IdentityDetail, IdentityDetailList
 # from api.instance import InstanceList, Instance,\
 #     InstanceAction, InstanceHistory, InstanceHistoryDetail,\
 #     InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
@@ -49,11 +49,12 @@ from api.version import Version
 from authentication.decorators import atmo_valid_token_required
 
 #Paste This for provider: provider\/(?P<provider_id>\\d+)
-# provider_specific = r"^provider/(?P<provider_id>\d+)"
+provider_specific = r"^provider/(?P<provider_id>\d+)"
+
 #Paste this for identity: 
 # /r'^provider\/(?P<provider_id>\\d+)\/identity\/(?P<identity_id>\
-# identity_specific = provider_specific + r"/identity/(?P<identity_id>\d+)"
-# user_match = "[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*)"
+identity_specific = provider_specific + r"/identity/(?P<identity_id>\d+)"
+user_match = "[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*)"
 
 # private_apis = patterns('',
 #     # E-mail API
@@ -266,7 +267,7 @@ public_apis = format_suffix_patterns(patterns(
     #     + '/icon$', MachineIcon.as_view(), name='machine-icon'),
 
 
-    # url(provider_specific + r'/identity$', IdentityList.as_view(), name='identity-list'),
+    url(provider_specific + r'/identity$', IdentityList.as_view(), name='identity-list'),
     # url(identity_specific + r'$', Identity.as_view(), name='identity-detail'),
 
 
