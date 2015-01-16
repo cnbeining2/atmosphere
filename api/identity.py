@@ -12,6 +12,7 @@ from api import failure_response
 from api.serializers import IdentitySerializer, IdentityDetailSerializer
 from api.permissions import InMaintenance, ApiAuthRequired
 
+
 class IdentityDetail(APIView):
     """The identity contains every credential necessary for atmosphere to connect 'The Provider' with a specific user.
     These credentials can vary from provider to provider.
@@ -72,7 +73,7 @@ class IdentityList(APIView):
     """
 
     permission_classes = (ApiAuthRequired,)
-    
+
     def get(self, request, provider_id, format=None):
         """
         List of identities for the user on the selected provider.
@@ -96,7 +97,7 @@ class Identity(APIView):
     """
 
     permission_classes = (ApiAuthRequired,)
-    
+
     def get(self, request, provider_id, identity_id, format=None):
         """
         Authentication Required, Get details for a specific identity.

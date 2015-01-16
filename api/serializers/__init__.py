@@ -3,3 +3,5 @@ from .ApplicationSerializer import ApplicationSerializer
 from .PaginatedApplicationSerializer import PaginatedApplicationSerializer
 from .MaintenanceRecordSerializer import MaintenanceRecordSerializer
 from .ProviderSerializer import ProviderSerializer
+from .IdentitySerializer import IdentitySerializer
+from IdentityDetailSerializer import IdentityDetailSerializer

@@ -252,16 +252,16 @@ class TagRelatedField(serializers.SlugRelatedField):
 #         fields = ('id', 'created_by', 'provider', )
 #
 #
-# class IdentitySerializer(serializers.ModelSerializer):
-#     created_by = serializers.CharField(source='creator_name')
-#     credentials = serializers.Field(source='get_credentials')
-#     quota = serializers.Field(source='get_quota_dict')
-#     membership = serializers.Field(source='get_membership')
-#
-#     class Meta:
-#         model = Identity
-#         fields = ('id', 'created_by', 'provider', 'credentials', 'quota',
-#                   'membership')
+    # class IdentitySerializer(serializers.ModelSerializer):
+    #     created_by = serializers.CharField(source='creator_name')
+    #     credentials = serializers.Field(source='get_credentials')
+    #     quota = serializers.Field(source='get_quota_dict')
+    #     membership = serializers.Field(source='get_membership')
+    #
+    #     class Meta:
+    #         model = Identity
+    #         fields = ('id', 'created_by', 'provider', 'credentials', 'quota',
+    #                   'membership')
 #
 #
 # class ApplicationSerializer(serializers.ModelSerializer):
@@ -509,14 +509,14 @@ class TagRelatedField(serializers.SlugRelatedField):
     #         exclude = ('provider',)
 #
 #
-# class IdentityDetailSerializer(serializers.ModelSerializer):
-#     created_by = serializers.CharField(source='creator_name')
-#     quota = serializers.Field(source='get_quota_dict')
-#     provider_id = serializers.Field(source='provider.id')
-#
-#     class Meta:
-#         model = Identity
-#         exclude = ('credentials', 'created_by', 'provider')
+    # class IdentityDetailSerializer(serializers.ModelSerializer):
+    #     created_by = serializers.CharField(source='creator_name')
+    #     quota = serializers.Field(source='get_quota_dict')
+    #     provider_id = serializers.Field(source='provider.id')
+    #
+    #     class Meta:
+    #         model = Identity
+    #         exclude = ('credentials', 'created_by', 'provider')
 #
 #
 # class AtmoUserSerializer(serializers.ModelSerializer):
