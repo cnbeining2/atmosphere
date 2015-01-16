@@ -1,7 +1,12 @@
 from core.models import Tag
 from rest_framework import serializers
 
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+
     class Meta:
         model = Tag
-        fields = ('url', 'id', 'name', 'description')
+        fields = ('id', 'name', 'description', 'user')

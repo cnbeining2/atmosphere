@@ -47,8 +47,8 @@ user_match = "[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*"
 
 admin.autodiscover()
 
-router = routers.DefaultRouter(trailing_slash=True)
-router.register(r'tag', views.TagViewSet)
+# router = routers.DefaultRouter(trailing_slash=True)
+# router.register(r'tag', views.TagViewSet)
 
 urlpatterns = patterns(
     '',
@@ -112,8 +112,8 @@ urlpatterns = patterns(
     #Error Redirection
     url(r'^no_user$', 'web.views.no_user_redirect'),
     #API Layer
-    # url(r'^api/v1/', include("api.urls", namespace="api")),
-    url(r'^api/v1/', include(router.urls)),
+    url(r'^api/v1/', include("api.urls", namespace="api")),
+    # url(r'^api/v1/', include(router.urls)),
 
     #API Documentation
     url(r'^api-auth/',
