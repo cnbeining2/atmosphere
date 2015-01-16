@@ -14,7 +14,7 @@ from api.application import ApplicationList #,ApplicationSearch, Application
 # from api.group import GroupList, Group
 # from api.identity_membership import IdentityMembershipList, IdentityMembership
 # from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
-from api.identity import IdentityDetailList
+from api.identity import IdentityDetail, IdentityDetailList
 # from api.instance import InstanceList, Instance,\
 #     InstanceAction, InstanceHistory, InstanceHistoryDetail,\
 #     InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
@@ -271,8 +271,9 @@ public_apis = format_suffix_patterns(patterns(
 
 
     url(r'^identity$', IdentityDetailList.as_view(), name='identity-detail-list'),
-    # url(r'^identity/(?P<identity_id>\d+)$', IdentityDetail.as_view(),
-    #     name='identity-detail-list'),
+    url(r'^identity/(?P<identity_id>\d+)$', IdentityDetail.as_view(), name='identity-detail-list'),
+
+
     url(r'^provider$', ProviderList.as_view(), name='provider-list'),
     url(r'^provider/(?P<provider_id>\d+)$', Provider.as_view(), name='provider-detail'),
 
