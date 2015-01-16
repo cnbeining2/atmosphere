@@ -33,7 +33,7 @@ from api.maintenance import MaintenanceRecordList #, MaintenanceRecord
 #         ProjectApplicationList, ProjectApplicationExchange,\
 #         ProjectVolumeList, ProjectVolumeExchange
 # from api.profile import Profile
-from api.provider import ProviderList #, Provider
+from api.provider import ProviderList, Provider
 # from api.size import SizeList, Size
 # from api.hypervisor import HypervisorList, HypervisorDetail
 # from api.step import StepList, Step
@@ -274,8 +274,7 @@ public_apis = format_suffix_patterns(patterns(
     # url(r'^identity/(?P<identity_id>\d+)$', IdentityDetail.as_view(),
     #     name='identity-detail-list'),
     url(r'^provider$', ProviderList.as_view(), name='provider-list'),
-    # url(r'^provider/(?P<provider_id>\d+)$',
-    #     Provider.as_view(), name='provider-detail'),
+    url(r'^provider/(?P<provider_id>\d+)$', Provider.as_view(), name='provider-detail'),
 
 
     # url(identity_specific + r'/request_image$',
