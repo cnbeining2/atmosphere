@@ -22,7 +22,7 @@ from api.application import ApplicationList #,ApplicationSearch, Application
 # from api.machine_request import MachineRequestList, MachineRequest,\
 #     MachineRequestStaffList, MachineRequestStaff
 # from api.machine_export import MachineExportList, MachineExport
-# from api.maintenance import MaintenanceRecordList, MaintenanceRecord
+from api.maintenance import MaintenanceRecordList #, MaintenanceRecord
 # from api.meta import Meta, MetaAction
 # from api.notification import NotificationList
 # from api.occupancy import Occupancy, Hypervisor
@@ -277,9 +277,10 @@ public_apis = format_suffix_patterns(patterns(
     #     Profile.as_view(), name='profile-detail'),
     #
     url(r'version$', Version.as_view()),
-    # url(r'^maintenance$',
-    #     MaintenanceRecordList.as_view(),
-    #     name='maintenance-record-list'),
+    url(r'^maintenance$',
+        MaintenanceRecordList.as_view(),
+        name='maintenance-record-list'
+    ),
 
 ))
 

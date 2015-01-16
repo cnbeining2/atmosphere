@@ -501,12 +501,12 @@ class TagRelatedField(serializers.SlugRelatedField):
 #                   'shared_with', 'new_machine')
 #
 #
-# class MaintenanceRecordSerializer(serializers.ModelSerializer):
-#     provider_id = serializers.Field(source='provider.id')
-#
-#     class Meta:
-#         model = MaintenanceRecord
-#         exclude = ('provider',)
+    # class MaintenanceRecordSerializer(serializers.ModelSerializer):
+    #     provider_id = serializers.Field(source='provider.id')
+    #
+    #     class Meta:
+    #         model = MaintenanceRecord
+    #         exclude = ('provider',)
 #
 #
 # class IdentityDetailSerializer(serializers.ModelSerializer):
@@ -757,12 +757,12 @@ class TagRelatedField(serializers.SlugRelatedField):
 #         model = ProviderType
 
 
-# class TagSerializer(serializers.ModelSerializer):
-#     # user = serializers.SlugRelatedField(slug_field='username')
-#     description = serializers.CharField(required=False)
-#
-#     class Meta:
-#         model = Tag
+    # class TagSerializer(serializers.ModelSerializer):
+    #     # user = serializers.SlugRelatedField(slug_field='username')
+    #     description = serializers.CharField(required=False)
+    #
+    #     class Meta:
+    #         model = Tag
 
 # class InstanceStatusHistorySerializer(serializers.ModelSerializer):
 #     instance = serializers.SlugRelatedField(slug_field='provider_alias')

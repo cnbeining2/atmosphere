@@ -1,3 +1,4 @@
 from .TagSerializer import TagSerializer
 from .ApplicationSerializer import ApplicationSerializer
 from .PaginatedApplicationSerializer import PaginatedApplicationSerializer
+from .MaintenanceRecordSerializer import MaintenanceRecordSerializer
