@@ -15,3 +15,4 @@ from .TagRelatedField import TagRelatedField
 # from .InstanceStatusHistorySerializer import InstanceStatusHistorySerializer
 # from .ProviderTypeSerializer import ProviderTypeSerializer
 # from .StepSerializer import StepSerializer
+# from .ProviderSizeSerializer import ProviderSizeSerializer
