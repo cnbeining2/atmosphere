@@ -17,6 +17,7 @@ from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailL
 # from api.instance import InstanceList, Instance,\
 #     InstanceAction, InstanceHistory, InstanceHistoryDetail,\
 #     InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
+from api.instance import InstanceList
 # from api.machine import MachineList, Machine, MachineHistory,\
 #     MachineSearch, MachineVote, MachineIcon
 # from api.machine_request import MachineRequestList, MachineRequest,\
@@ -86,7 +87,7 @@ private_apis = patterns('',
 #     url(r'project/null/volume$',
 #         NoProjectVolumeList.as_view(),
 #         name='empty-project-volume-list'),
-#
+# #
 #     url(r'project/(?P<project_id>\d+)$',
 #         ProjectDetail.as_view(),
 #         name='project-detail'),
@@ -230,8 +231,8 @@ public_apis = format_suffix_patterns(patterns(
     #     InstanceAction.as_view(), name='instance-action'),
     # url(identity_specific + r'/instance/(?P<instance_id>[a-zA-Z0-9-]+)$',
     #     Instance.as_view(), name='instance-detail'),
-    # url(identity_specific + r'/instance$',
-    #     InstanceList.as_view(), name='instance-list'),
+    url(identity_specific + r'/instance$',
+        InstanceList.as_view(), name='instance-list'),
 
 
     # url(identity_specific + r'/size$',

@@ -13,14 +13,12 @@ from threepio import logger
 
 
 from api import failure_response
-from api.serializers import ProjectSerializer, InstanceSerializer,\
-        VolumeSerializer, ApplicationSerializer
+from api.serializers import ProjectSerializer, InstanceSerializer, VolumeSerializer, ApplicationSerializer
 from core.models.application import Application
 from core.models.project import Project
 from core.models.group import Group, get_user_group
 from core.query import only_current
-from api.permissions import InMaintenance, ApiAuthRequired,\
-        ProjectOwnerRequired
+from api.permissions import InMaintenance, ApiAuthRequired, ProjectOwnerRequired
 from api.serializers import NoProjectSerializer
 
 from django.utils import timezone
@@ -238,6 +236,8 @@ class NoProjectList(APIView):
                                             context={"request":request}).data
         response = Response(serialized_data)
         return response
+
+
 class NoProjectVolumeList(APIView):
     """
     """
@@ -252,6 +252,7 @@ class NoProjectVolumeList(APIView):
                                             context={"request":request}).data
         response = Response(serialized_data)
         return response
+
 
 class NoProjectApplicationList(APIView):
     """
