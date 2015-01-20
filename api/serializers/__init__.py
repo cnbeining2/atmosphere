@@ -20,3 +20,4 @@ from .TagRelatedField import TagRelatedField
 # from .VolumeSerializer import VolumeSerializer
 # from .GroupSerializer import GroupSerializer
 # from .PaginatedProviderMachineSerializer import PaginatedProviderMachineSerializer
+# from .ProviderMachineSerializer import ProviderMachineSerializer
