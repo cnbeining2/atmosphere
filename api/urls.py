@@ -8,7 +8,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 # from api.accounts import Account
 from api.application import ApplicationList #,ApplicationSearch, Application
-# from api.bookmark import  ApplicationBookmarkDetail, ApplicationBookmarkList
+from api.bookmark import  ApplicationBookmarkDetail, ApplicationBookmarkList
 from api.email import Feedback, QuotaEmail, SupportEmail
 # from api.flow import Flow
 # from api.group import GroupList, Group
@@ -26,7 +26,7 @@ from api.instance import InstanceList, Instance
 from api.maintenance import MaintenanceRecordList, MaintenanceRecord
 # from api.meta import Meta, MetaAction
 # from api.notification import NotificationList
-# from api.occupancy import Occupancy, Hypervisor
+from api.occupancy import Occupancy, Hypervisor
 from api.project import NoProjectList, NoProjectInstanceList, NoProjectVolumeList, NoProjectApplicationList
 from api.project import ProjectList, ProjectDetail
 from api.project import ProjectInstanceList, ProjectInstanceExchange, ProjectApplicationList, ProjectApplicationExchange, ProjectVolumeList, ProjectVolumeExchange
@@ -87,19 +87,17 @@ private_apis = patterns('',
     url(r'^maintenance/(?P<record_id>\d+)$', MaintenanceRecord.as_view(), name='maintenance-record'),
     # url(r'^notification$', NotificationList.as_view()),
     # url(r'^token_emulate/(?P<username>.*)$', TokenEmulate.as_view()),
-    #
+
     # #url(r'^user$', atmo_valid_token_required(UserManagement.as_view())),
     # #url(r'^user/(?P<username>.*)$', User.as_view()),
-    #
+
     # url(provider_specific + r'/occupancy$', Occupancy.as_view(), name='occupancy'),
     # url(provider_specific + r'/hypervisor$', Hypervisor.as_view(), name='hypervisor'),
-    #
-    # #Application Bookmarks (Leave out until new UI Ready )
-    # url(r'^bookmark$', ApplicationBookmarkList.as_view(), name='bookmark-list'),
-    #
-    # url(r'^bookmark/application$', ApplicationBookmarkList.as_view(), name='bookmark-application-list'),
-    #
-    # url(r'^bookmark/application/(?P<app_uuid>[a-zA-Z0-9-]+)$', ApplicationBookmarkDetail.as_view(), name='bookmark-application'),
+
+    # Application Bookmarks (Leave out until new UI Ready )
+    url(r'^bookmark$', ApplicationBookmarkList.as_view(), name='bookmark-list'),
+    url(r'^bookmark/application$', ApplicationBookmarkList.as_view(), name='bookmark-application-list'),
+    url(r'^bookmark/application/(?P<app_uuid>[a-zA-Z0-9-]+)$', ApplicationBookmarkDetail.as_view(), name='bookmark-application'),
 
 
     #Machine Requests (Staff view)
