@@ -16,7 +16,7 @@ from api.email import Feedback, QuotaEmail, SupportEmail
 from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
 from api.instance import InstanceList, Instance, InstanceHistory, InstanceHistoryDetail, InstanceStatusHistoryDetail #, InstanceAction, InstanceTagList, InstanceTagDetail
 from api.instance import InstanceList, Instance
-# from api.machine import MachineList, Machine, MachineHistory, MachineSearch, MachineVote, MachineIcon
+from api.machine import MachineList, Machine, MachineHistory, MachineSearch, MachineVote, MachineIcon
 from api.machine_request import MachineRequestList, MachineRequest, MachineRequestStaffList, MachineRequestStaff
 # from api.machine_export import MachineExportList, MachineExport
 from api.maintenance import MaintenanceRecordList, MaintenanceRecord
@@ -28,7 +28,7 @@ from api.project import ProjectList, ProjectDetail
 from api.project import ProjectInstanceList, ProjectInstanceExchange, ProjectApplicationList, ProjectApplicationExchange, ProjectVolumeList, ProjectVolumeExchange
 from api.profile import Profile
 from api.provider import ProviderList, Provider
-# from api.size import SizeList, Size
+from api.size import SizeList, Size
 # from api.hypervisor import HypervisorList, HypervisorDetail
 # from api.step import StepList, Step
 from api.tag import TagList, Tag
@@ -156,7 +156,7 @@ public_apis = format_suffix_patterns(patterns(
     url(identity_specific + r'/instance$', InstanceList.as_view(), name='instance-list'),
 
 
-    # url(identity_specific + r'/size$', SizeList.as_view(), name='size-list'),
+    url(identity_specific + r'/size$', SizeList.as_view(), name='size-list'),
     # url(identity_specific + r'/size/(?P<size_id>\d+)$', Size.as_view(), name='size-detail'),
 
 

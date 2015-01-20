@@ -1,4 +1,5 @@
 from threepio import logger
+from django.core.exceptions import ObjectDoesNotExist
 
 import rtwo.compute  # Necessary to initialize Meta classes
 from rtwo.provider import AWSProvider, AWSUSEastProvider,\
