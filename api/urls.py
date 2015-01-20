@@ -73,9 +73,9 @@ private_apis = patterns('',
     url(r'project$', ProjectList.as_view(), name='project-list'),
 #
     url(r'project/null$', NoProjectList.as_view(), name='empty-project-list'),
-    # url(r'project/null/application$', NoProjectApplicationList.as_view(), name='empty-project-application-list'),
-    # url(r'project/null/instance$', NoProjectInstanceList.as_view(), name='empty-project-instance-list'),
-    # url(r'project/null/volume$', NoProjectVolumeList.as_view(), name='empty-project-volume-list'),
+    url(r'project/null/application$', NoProjectApplicationList.as_view(), name='empty-project-application-list'),
+    url(r'project/null/instance$', NoProjectInstanceList.as_view(), name='empty-project-instance-list'),
+    url(r'project/null/volume$', NoProjectVolumeList.as_view(), name='empty-project-volume-list'),
 # #
     url(r'project/(?P<project_id>\d+)$', ProjectDetail.as_view(), name='project-detail'),
 #     url(r'project/(?P<project_id>\d+)/application$', ProjectApplicationList.as_view(), name='project-application-list'),
