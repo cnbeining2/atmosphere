@@ -5,7 +5,7 @@ from .IdentityRelatedField import IdentityRelatedField
 
 
 class AtmoUserSerializer(serializers.ModelSerializer):
-    selected_identity = IdentityRelatedField(source='select_identity')
+    selected_identity = IdentityRelatedField(source='select_identity', read_only=True)
 
     def validate_selected_identity(self, attrs, source):
         """
