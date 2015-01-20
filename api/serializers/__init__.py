@@ -28,13 +28,13 @@ from .MachineRequestSerializer import MachineRequestSerializer
 from .MachineExportSerializer import MachineExportSerializer
 from .PaginatedInstanceSerializer import PaginatedInstanceSerializer
 from .PaginatedInstanceHistorySerializer import PaginatedInstanceHistorySerializer
-# from .InstanceHistorySerializer import InstanceHistorySerializer
-# from .CredentialSerializer import CredentialSerializer
-# from .ApplicationScoreSerializer import ApplicationScoreSerializer
-# from .ApplicationBookmarkSerializer import ApplicationBookmarkSerializer
-# from .AccountSerializer import AccountSerializer
-# from .InstanceRelatedField import InstanceRelatedField
-# from .IdentityRelatedField import IdentityRelatedField
+from .InstanceHistorySerializer import InstanceHistorySerializer
+from .CredentialSerializer import CredentialSerializer
+from .ApplicationScoreSerializer import ApplicationScoreSerializer
+from .ApplicationBookmarkSerializer import ApplicationBookmarkSerializer
+from .AccountSerializer import AccountSerializer
+from .InstanceRelatedField import InstanceRelatedField
+from .IdentityRelatedField import IdentityRelatedField
 # todo: replace WritableFeild with override of to_internal_value()
 # from .AppBookmarkField import AppBookmarkField
 # todo: replace WritableFeild with override of to_internal_value()
