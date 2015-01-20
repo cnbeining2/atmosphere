@@ -10,8 +10,8 @@ from .InstanceSerializer import InstanceSerializer
 from .TagRelatedField import TagRelatedField
 
 # Not tested
-# from .ProjectSerializer import ProjectSerializer
-# from .ProjectsField import ProjectsField
+from .ProjectSerializer import ProjectSerializer
+# from .ProjectsField import ProjectsField # todo: replace WritableFeild with override of to_internal_value()
 # from .InstanceStatusHistorySerializer import InstanceStatusHistorySerializer
 # from .ProviderTypeSerializer import ProviderTypeSerializer
 # from .StepSerializer import StepSerializer

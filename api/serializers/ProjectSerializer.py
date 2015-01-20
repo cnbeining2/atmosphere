@@ -9,7 +9,7 @@ from core.models.project import Project
 
 class ProjectSerializer(serializers.ModelSerializer):
     #Edits to Writable fields..
-    owner = serializers.SlugRelatedField(slug_field="name")
+    owner = serializers.SlugRelatedField(slug_field="name", read_only=True)
     # These fields are READ-ONLY!
     applications = serializers.SerializerMethodField('get_user_applications')
     instances = serializers.SerializerMethodField('get_user_instances')
