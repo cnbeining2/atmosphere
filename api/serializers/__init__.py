@@ -30,3 +30,4 @@ from .TagRelatedField import TagRelatedField
 # from .InstanceHistorySerializer import InstanceHistorySerializer
 # from .CredentialSerializer import CredentialSerializer
 # from .ApplicationScoreSerializer import ApplicationScoreSerializer
+# from .ApplicationBookmarkSerializer import ApplicationBookmarkSerializer
