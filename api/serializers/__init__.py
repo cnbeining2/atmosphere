@@ -23,3 +23,4 @@ from .TagRelatedField import TagRelatedField
 # from .ProviderMachineSerializer import ProviderMachineSerializer
 # from .ProfileSerializer import ProfileSerializer
 # from .AtmoUserSerializer import AtmoUserSerializer
+# from .MachineRequestSerializer import MachineRequestSerializer
