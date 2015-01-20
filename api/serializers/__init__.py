@@ -11,7 +11,8 @@ from .TagRelatedField import TagRelatedField
 
 # Not tested
 from .ProjectSerializer import ProjectSerializer
-# from .ProjectsField import ProjectsField # todo: replace WritableFeild with override of to_internal_value()
+# todo: replace WritableFeild with override of to_internal_value()
+# from .ProjectsField import ProjectsField
 # from .InstanceStatusHistorySerializer import InstanceStatusHistorySerializer
 # from .ProviderTypeSerializer import ProviderTypeSerializer
 # from .StepSerializer import StepSerializer
@@ -34,5 +35,7 @@ from .ProjectSerializer import ProjectSerializer
 # from .AccountSerializer import AccountSerializer
 # from .InstanceRelatedField import InstanceRelatedField
 # from .IdentityRelatedField import IdentityRelatedField
+# todo: replace WritableFeild with override of to_internal_value()
 # from .AppBookmarkField import AppBookmarkField
+# todo: replace WritableFeild with override of to_internal_value()
 # from .NewThresholdField import NewThresholdField
