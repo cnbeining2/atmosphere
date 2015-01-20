@@ -22,3 +22,4 @@ from .TagRelatedField import TagRelatedField
 # from .PaginatedProviderMachineSerializer import PaginatedProviderMachineSerializer
 # from .ProviderMachineSerializer import ProviderMachineSerializer
 # from .ProfileSerializer import ProfileSerializer
+# from .AtmoUserSerializer import AtmoUserSerializer
