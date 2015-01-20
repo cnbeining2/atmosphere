@@ -12,7 +12,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     groups = serializers.CharField(read_only=True, source='user.groups.all')
     is_staff = serializers.BooleanField(source='user.is_staff')
     is_superuser = serializers.BooleanField(source='user.is_superuser')
-    selected_identity = IdentityRelatedField(source='user.select_identity')
+    selected_identity = IdentityRelatedField(source='user.select_identity', read_only=True)
 
     class Meta:
         model = UserProfile
