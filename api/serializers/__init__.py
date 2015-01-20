@@ -25,3 +25,4 @@ from .TagRelatedField import TagRelatedField
 # from .AtmoUserSerializer import AtmoUserSerializer
 # from .MachineRequestSerializer import MachineRequestSerializer
 # from .MachineExportSerializer import MachineExportSerializer
+# from .PaginatedInstanceSerializer import PaginatedInstanceSerializer

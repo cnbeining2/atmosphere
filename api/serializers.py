@@ -262,11 +262,3 @@
 #     """
 #     class Meta:
 #         object_serializer_class = InstanceHistorySerializer
-
-
-# class PaginatedInstanceSerializer(pagination.PaginationSerializer):
-#     """
-#     Serializes page objects of Instance querysets.
-#     """
-#     class Meta:
-#         object_serializer_class = InstanceSerializer
