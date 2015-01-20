@@ -522,9 +522,3 @@
 #     class Meta:
 #         model = Step
 #         exclude = ('id', 'instance', 'created_by_identity')
-
-
-# class ProviderTypeSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ProviderType
-

@@ -13,3 +13,4 @@ from .TagRelatedField import TagRelatedField
 # from .ProjectSerializer import ProjectSerializer
 # from .ProjectsField import ProjectsField
 # from .InstanceStatusHistorySerializer import InstanceStatusHistorySerializer
+# from .ProviderTypeSerializer import ProviderTypeSerializer
