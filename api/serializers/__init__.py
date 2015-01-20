@@ -26,8 +26,8 @@ from .ProfileSerializer import ProfileSerializer
 from .AtmoUserSerializer import AtmoUserSerializer
 from .MachineRequestSerializer import MachineRequestSerializer
 from .MachineExportSerializer import MachineExportSerializer
-# from .PaginatedInstanceSerializer import PaginatedInstanceSerializer
-# from .PaginatedInstanceHistorySerializer import PaginatedInstanceHistorySerializer
+from .PaginatedInstanceSerializer import PaginatedInstanceSerializer
+from .PaginatedInstanceHistorySerializer import PaginatedInstanceHistorySerializer
 # from .InstanceHistorySerializer import InstanceHistorySerializer
 # from .CredentialSerializer import CredentialSerializer
 # from .ApplicationScoreSerializer import ApplicationScoreSerializer
