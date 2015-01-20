@@ -140,7 +140,7 @@ public_apis = format_suffix_patterns(patterns(
 
 
     url(r'^application/search$', ApplicationSearch.as_view(), name='application-search'),
-    # url(r'^application/(?P<app_uuid>[a-zA-Z0-9-]+)$', Application.as_view(), name='application-detail'),
+    url(r'^application/(?P<app_uuid>[a-zA-Z0-9-]+)$', Application.as_view(), name='application-detail'),
 
 
     # url(r'^instance_history$', InstanceHistory.as_view(), name='instance-history'),
