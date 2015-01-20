@@ -205,7 +205,7 @@ AUTH_PROFILE_MODULE = 'core.UserProfile'
 
 AUTHENTICATION_BACKENDS = (
     #For Always-OK Access
-    #'authentication.authBackends.MockLoginBackend',
+    'authentication.authBackends.MockLoginBackend',
     # For Token-Access
     'authentication.authBackends.AuthTokenLoginBackend',
     # For Web-Access
