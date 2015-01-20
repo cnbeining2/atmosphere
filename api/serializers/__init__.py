@@ -18,3 +18,4 @@ from .TagRelatedField import TagRelatedField
 # from .ProviderSizeSerializer import ProviderSizeSerializer
 # from .NoProjectSerializer import NoProjectSerializer
 # from .VolumeSerializer import VolumeSerializer
+# from .GroupSerializer import GroupSerializer
