@@ -14,14 +14,10 @@ from api.email import Feedback, QuotaEmail, SupportEmail
 # from api.group import GroupList, Group
 # from api.identity_membership import IdentityMembershipList, IdentityMembership
 from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
-# from api.instance import InstanceList, Instance,\
-#     InstanceAction, InstanceHistory, InstanceHistoryDetail,\
-#     InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
+# from api.instance import InstanceList, Instance, InstanceAction, InstanceHistory, InstanceHistoryDetail, InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
 from api.instance import InstanceList, Instance
-# from api.machine import MachineList, Machine, MachineHistory,\
-#     MachineSearch, MachineVote, MachineIcon
-# from api.machine_request import MachineRequestList, MachineRequest,\
-#     MachineRequestStaffList, MachineRequestStaff
+# from api.machine import MachineList, Machine, MachineHistory, MachineSearch, MachineVote, MachineIcon
+from api.machine_request import MachineRequestList, MachineRequest, MachineRequestStaffList, MachineRequestStaff
 # from api.machine_export import MachineExportList, MachineExport
 from api.maintenance import MaintenanceRecordList, MaintenanceRecord
 # from api.meta import Meta, MetaAction
@@ -30,18 +26,16 @@ from api.occupancy import Occupancy, Hypervisor
 from api.project import NoProjectList, NoProjectInstanceList, NoProjectVolumeList, NoProjectApplicationList
 from api.project import ProjectList, ProjectDetail
 from api.project import ProjectInstanceList, ProjectInstanceExchange, ProjectApplicationList, ProjectApplicationExchange, ProjectVolumeList, ProjectVolumeExchange
-# from api.profile import Profile
+from api.profile import Profile
 from api.provider import ProviderList, Provider
 # from api.size import SizeList, Size
 # from api.hypervisor import HypervisorList, HypervisorDetail
 # from api.step import StepList, Step
 from api.tag import TagList, Tag
 # from api.token import TokenEmulate
-# from api.user import UserManagement, User
+from api.user import UserManagement, User
 from api.version import Version
-# from api.volume import BootVolume, \
-#         VolumeSnapshot, VolumeSnapshotDetail, \
-#         VolumeList, Volume
+# from api.volume import BootVolume, VolumeSnapshot, VolumeSnapshotDetail, VolumeList, Volume
 
 from authentication.decorators import atmo_valid_token_required
 
@@ -88,8 +82,8 @@ private_apis = patterns('',
     # url(r'^notification$', NotificationList.as_view()),
     # url(r'^token_emulate/(?P<username>.*)$', TokenEmulate.as_view()),
 
-    # #url(r'^user$', atmo_valid_token_required(UserManagement.as_view())),
-    # #url(r'^user/(?P<username>.*)$', User.as_view()),
+    # url(r'^user$', atmo_valid_token_required(UserManagement.as_view())),
+    # url(r'^user/(?P<username>.*)$', User.as_view()),
 
     # url(provider_specific + r'/occupancy$', Occupancy.as_view(), name='occupancy'),
     # url(provider_specific + r'/hypervisor$', Hypervisor.as_view(), name='hypervisor'),
@@ -101,14 +95,12 @@ private_apis = patterns('',
 
 
     #Machine Requests (Staff view)
-    # url(r'^request_image$', MachineRequestStaffList.as_view(), name='direct-machine-request-list'),
-    # url(r'^request_image/(?P<machine_request_id>\d+)$', MachineRequestStaff.as_view(), name='direct-machine-request-detail'),
-    # url(r'^request_image/(?P<machine_request_id>\d+)/(?P<action>.*)$', MachineRequestStaff.as_view(), name='direct-machine-request-action'),
-    #
-    #
+    url(r'^request_image$', MachineRequestStaffList.as_view(), name='direct-machine-request-list'),
+    url(r'^request_image/(?P<machine_request_id>\d+)$', MachineRequestStaff.as_view(), name='direct-machine-request-detail'),
+    url(r'^request_image/(?P<machine_request_id>\d+)/(?P<action>.*)$', MachineRequestStaff.as_view(), name='direct-machine-request-action'),
+
     # url(provider_specific + r'/account/(?P<username>([A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*))$', Account.as_view(), name='account-management'),
-    #
-    #
+
     # url(identity_specific + r'/image_export$', MachineExportList.as_view(), name='machine-export-list'),
     # url(identity_specific + r'/image_export/(?P<machine_request_id>\d+)$', MachineExport.as_view(), name='machine-export'),
     #
@@ -131,7 +123,7 @@ private_apis = patterns('',
 
 public_apis = format_suffix_patterns(patterns(
     '',
-    # url(r'^profile$', Profile.as_view(), name='profile'),
+    url(r'^profile$', Profile.as_view(), name='profile'),
 
 
     # url(r'^group$', GroupList.as_view(), name='group-list'),

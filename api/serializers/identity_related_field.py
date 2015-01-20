@@ -4,7 +4,7 @@ from core.models.identity import Identity
 
 class IdentityRelatedField(serializers.RelatedField):
 
-    def to_native(self, identity):
+    def to_representation(self, identity):
         quota_dict = identity.get_quota_dict()
         return {
             "id": identity.id,
