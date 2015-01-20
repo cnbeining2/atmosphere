@@ -21,3 +21,4 @@ from .TagRelatedField import TagRelatedField
 # from .GroupSerializer import GroupSerializer
 # from .PaginatedProviderMachineSerializer import PaginatedProviderMachineSerializer
 # from .ProviderMachineSerializer import ProviderMachineSerializer
+# from .ProfileSerializer import ProfileSerializer
