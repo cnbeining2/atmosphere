@@ -423,12 +423,3 @@
 #     class Meta:
 #         model = ProviderMachine
 #         exclude = ('id', 'provider', 'application', 'identity')
-
-
-# class PaginatedProviderMachineSerializer(pagination.PaginationSerializer):
-#     """
-#     Serializes page objects of ProviderMachine querysets.
-#     """
-#     class Meta:
-#         object_serializer_class = ProviderMachineSerializer
-
