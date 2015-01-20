@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core.models.machine_request import MachineRequest
-from .NewThresholdField import NewThresholdField
+# from .NewThresholdField import NewThresholdField
 
 class MachineRequestSerializer(serializers.ModelSerializer):
     """
@@ -27,7 +27,7 @@ class MachineRequestSerializer(serializers.ModelSerializer):
     description = serializers.CharField(source='new_machine_description',
                                         required=False)
     tags = serializers.CharField(source='new_machine_tags', required=False)
-    threshold = NewThresholdField(source='new_machine_threshold')
+    # threshold = NewThresholdField(source='new_machine_threshold')
     new_machine = serializers.SlugRelatedField(slug_field='identifier',
                                                required=False)
 
