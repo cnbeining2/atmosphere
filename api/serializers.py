@@ -124,10 +124,3 @@
 #                 provider_alias=value).provider_alias
 #         except Instance.DoesNotExist:
 #             into[field_name] = None
-
-
-# # Serializers
-# class AccountSerializer(serializers.Serializer):
-#     pass
-#     #Define fields here
-#     #TODO: Define a spec that we expect from list_users across all providers

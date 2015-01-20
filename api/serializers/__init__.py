@@ -31,3 +31,4 @@ from .TagRelatedField import TagRelatedField
 # from .CredentialSerializer import CredentialSerializer
 # from .ApplicationScoreSerializer import ApplicationScoreSerializer
 # from .ApplicationBookmarkSerializer import ApplicationBookmarkSerializer
+# from .AccountSerializer import AccountSerializer
