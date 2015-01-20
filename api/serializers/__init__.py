@@ -35,3 +35,4 @@ from .TagRelatedField import TagRelatedField
 # from .InstanceRelatedField import InstanceRelatedField
 # from .IdentityRelatedField import IdentityRelatedField
 # from .AppBookmarkField import AppBookmarkField
+# from .NewThresholdField import NewThresholdField
