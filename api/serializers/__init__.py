@@ -7,6 +7,9 @@ from .IdentitySerializer import IdentitySerializer
 from .IdentityDetailSerializer import IdentityDetailSerializer
 from .CleanedIdentitySerializer import CleanedIdentitySerializer
 from .InstanceSerializer import InstanceSerializer
+from .TagRelatedField import TagRelatedField
+
+# Not tested
 # from .ProjectSerializer import ProjectSerializer
 # from .ProjectsField import ProjectsField
-from .TagRelatedField import TagRelatedField
+# from .InstanceStatusHistorySerializer import InstanceStatusHistorySerializer
