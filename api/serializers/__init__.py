@@ -14,8 +14,8 @@ from .ProjectSerializer import ProjectSerializer
 # todo: replace WritableFeild with override of to_internal_value()
 # from .ProjectsField import ProjectsField
 from .InstanceStatusHistorySerializer import InstanceStatusHistorySerializer
-# from .ProviderTypeSerializer import ProviderTypeSerializer
-# from .StepSerializer import StepSerializer
+from .ProviderTypeSerializer import ProviderTypeSerializer
+from .StepSerializer import StepSerializer
 # from .ProviderSizeSerializer import ProviderSizeSerializer
 # from .NoProjectSerializer import NoProjectSerializer
 # from .VolumeSerializer import VolumeSerializer
