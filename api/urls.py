@@ -17,7 +17,7 @@ from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailL
 # from api.instance import InstanceList, Instance,\
 #     InstanceAction, InstanceHistory, InstanceHistoryDetail,\
 #     InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
-from api.instance import InstanceList
+from api.instance import InstanceList, Instance
 # from api.machine import MachineList, Machine, MachineHistory,\
 #     MachineSearch, MachineVote, MachineIcon
 # from api.machine_request import MachineRequestList, MachineRequest,\
@@ -229,8 +229,8 @@ public_apis = format_suffix_patterns(patterns(
     # url(identity_specific + r'/instance/'
     #     + '(?P<instance_id>[a-za-z0-9-]+)/action$',
     #     InstanceAction.as_view(), name='instance-action'),
-    # url(identity_specific + r'/instance/(?P<instance_id>[a-zA-Z0-9-]+)$',
-    #     Instance.as_view(), name='instance-detail'),
+    url(identity_specific + r'/instance/(?P<instance_id>[a-zA-Z0-9-]+)$',
+        Instance.as_view(), name='instance-detail'),
     url(identity_specific + r'/instance$',
         InstanceList.as_view(), name='instance-list'),
 
