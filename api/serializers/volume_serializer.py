@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .CleanedIdentitySerializer import CleanedIdentitySerializer
-# from .ProjectsField import ProjectsField
+from .cleaned_identity_serializer import CleanedIdentitySerializer
+# from .projects_field import ProjectsField
 from .get_context_user import get_context_user
 from core.models import Volume
 

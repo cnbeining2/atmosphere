@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .CleanedIdentitySerializer import CleanedIdentitySerializer
-from .TagRelatedField import TagRelatedField
+from .cleaned_identity_serializer import CleanedIdentitySerializer
+from .tag_related_field import TagRelatedField
 from .get_context_user import get_context_user
-# from .ProjectsField import ProjectsField
+# from .projects_field import ProjectsField
 from core.models import Instance
 
 

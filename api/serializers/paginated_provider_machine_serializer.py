@@ -1,5 +1,5 @@
 from rest_framework import pagination
-from .ProviderMachineSerializer import ProviderMachineSerializer
+from .provider_machine_serializer import ProviderMachineSerializer
 
 class PaginatedProviderMachineSerializer(pagination.PaginationSerializer):
     """

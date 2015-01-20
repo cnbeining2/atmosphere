@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .TagRelatedField import TagRelatedField
+from .tag_related_field import TagRelatedField
 from core.models.instance import Instance
 
 

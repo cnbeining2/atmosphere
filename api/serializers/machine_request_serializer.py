@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core.models.machine_request import MachineRequest
-# from .NewThresholdField import NewThresholdField
+# from .new_threshold_field import NewThresholdField
 
 class MachineRequestSerializer(serializers.ModelSerializer):
     """

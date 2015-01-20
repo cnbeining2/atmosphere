@@ -1,41 +1,41 @@
-from .TagSerializer import TagSerializer
-from .ApplicationSerializer import ApplicationSerializer
-from .PaginatedApplicationSerializer import PaginatedApplicationSerializer
-from .MaintenanceRecordSerializer import MaintenanceRecordSerializer
-from .ProviderSerializer import ProviderSerializer
-from .IdentitySerializer import IdentitySerializer
-from .IdentityDetailSerializer import IdentityDetailSerializer
-from .CleanedIdentitySerializer import CleanedIdentitySerializer
-from .InstanceSerializer import InstanceSerializer
-from .TagRelatedField import TagRelatedField
+from .tag_serializer import TagSerializer
+from .application_serializer import ApplicationSerializer
+from .paginated_application_serializer import PaginatedApplicationSerializer
+from .maintenance_record_serializer import MaintenanceRecordSerializer
+from .provider_serializer import ProviderSerializer
+from .identity_serializer import IdentitySerializer
+from .identity_detail_serializer import IdentityDetailSerializer
+from .cleaned_identity_serializer import CleanedIdentitySerializer
+from .instance_serializer import InstanceSerializer
+from .tag_related_field import TagRelatedField
 
 # Not tested
-from .ProjectSerializer import ProjectSerializer
+from .project_serializer import ProjectSerializer
 # todo: replace WritableFeild with override of to_internal_value()
-# from .ProjectsField import ProjectsField
-from .InstanceStatusHistorySerializer import InstanceStatusHistorySerializer
-from .ProviderTypeSerializer import ProviderTypeSerializer
-from .StepSerializer import StepSerializer
-from .ProviderSizeSerializer import ProviderSizeSerializer
-from .NoProjectSerializer import NoProjectSerializer
-from .VolumeSerializer import VolumeSerializer
-from .GroupSerializer import GroupSerializer
-from .PaginatedProviderMachineSerializer import PaginatedProviderMachineSerializer
-from .ProviderMachineSerializer import ProviderMachineSerializer
-from .ProfileSerializer import ProfileSerializer
-from .AtmoUserSerializer import AtmoUserSerializer
-from .MachineRequestSerializer import MachineRequestSerializer
-from .MachineExportSerializer import MachineExportSerializer
-from .PaginatedInstanceSerializer import PaginatedInstanceSerializer
-from .PaginatedInstanceHistorySerializer import PaginatedInstanceHistorySerializer
-from .InstanceHistorySerializer import InstanceHistorySerializer
-from .CredentialSerializer import CredentialSerializer
-from .ApplicationScoreSerializer import ApplicationScoreSerializer
-from .ApplicationBookmarkSerializer import ApplicationBookmarkSerializer
-from .AccountSerializer import AccountSerializer
-from .InstanceRelatedField import InstanceRelatedField
-from .IdentityRelatedField import IdentityRelatedField
+# from .projects_field import ProjectsField
+from .instance_status_history_serializer import InstanceStatusHistorySerializer
+from .provider_type_serializer import ProviderTypeSerializer
+from .step_serializer import StepSerializer
+from .provider_size_serializer import ProviderSizeSerializer
+from .no_project_serializer import NoProjectSerializer
+from .volume_serializer import VolumeSerializer
+from .group_serializer import GroupSerializer
+from .paginated_provider_machine_serializer import PaginatedProviderMachineSerializer
+from .provider_machine_serializer import ProviderMachineSerializer
+from .profile_serializer import ProfileSerializer
+from .atmo_user_serializer import AtmoUserSerializer
+from .machine_request_serializer import MachineRequestSerializer
+from .machine_export_serializer import MachineExportSerializer
+from .paginated_instance_serializer import PaginatedInstanceSerializer
+from .paginated_instance_history_serializer import PaginatedInstanceHistorySerializer
+from .instance_history_serializer import InstanceHistorySerializer
+from .credential_serializer import CredentialSerializer
+from .application_score_serializer import ApplicationScoreSerializer
+from .application_bookmark_serializer import ApplicationBookmarkSerializer
+from .account_serializer import AccountSerializer
+from .instance_related_field import InstanceRelatedField
+from .identity_related_field import IdentityRelatedField
 # todo: replace WritableFeild with override of to_internal_value()
-# from .AppBookmarkField import AppBookmarkField
+# from .app_bookmark_field import AppBookmarkField
 # todo: replace WritableFeild with override of to_internal_value()
-# from .NewThresholdField import NewThresholdField
+# from .new_threshold_field import NewThresholdField

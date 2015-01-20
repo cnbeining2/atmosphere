@@ -1,5 +1,5 @@
 from rest_framework import pagination
-from .InstanceHistorySerializer import InstanceHistorySerializer
+from .instance_history_serializer import InstanceHistorySerializer
 
 
 class PaginatedInstanceHistorySerializer(pagination.PaginationSerializer):

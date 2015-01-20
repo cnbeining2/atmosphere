@@ -1,6 +1,6 @@
 from rest_framework import pagination
 from .get_context_user import get_context_user
-from .ApplicationSerializer import ApplicationSerializer
+from .application_serializer import ApplicationSerializer
 
 
 class PaginatedApplicationSerializer(pagination.PaginationSerializer):

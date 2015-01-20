@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core.models.profile import UserProfile
-from .IdentityRelatedField import IdentityRelatedField
+from .identity_related_field import IdentityRelatedField
 
 
 class ProfileSerializer(serializers.ModelSerializer):

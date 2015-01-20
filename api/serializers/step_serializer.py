@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from core.models.step import Step
-from .InstanceRelatedField import InstanceRelatedField
+from .instance_related_field import InstanceRelatedField
+
 
 class StepSerializer(serializers.ModelSerializer):
     alias = serializers.CharField(read_only=True, source='alias')

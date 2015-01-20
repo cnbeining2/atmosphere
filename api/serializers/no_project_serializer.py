@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .ApplicationSerializer import ApplicationSerializer
-from .InstanceSerializer import InstanceSerializer
-from .VolumeSerializer import VolumeSerializer
+from .application_serializer import ApplicationSerializer
+from .instance_serializer import InstanceSerializer
+from .volume_serializer import VolumeSerializer
 from core.models.user import AtmosphereUser
 from core.query import only_current
 

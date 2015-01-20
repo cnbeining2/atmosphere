@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from threepio import logger
 from core.models.user import AtmosphereUser
-from .IdentityRelatedField import IdentityRelatedField
+from .identity_related_field import IdentityRelatedField
 
 
 class AtmoUserSerializer(serializers.ModelSerializer):
