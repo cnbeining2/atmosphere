@@ -221,9 +221,3 @@
 #     class Meta:
 #         model = ApplicationScore
 #         fields = ('username', "application", "vote")
-
-
-# class CredentialSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Credential
-#         exclude = ('identity',)
