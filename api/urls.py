@@ -14,7 +14,7 @@ from api.email import Feedback, QuotaEmail, SupportEmail
 # from api.group import GroupList, Group
 # from api.identity_membership import IdentityMembershipList, IdentityMembership
 from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
-from api.instance import InstanceList, Instance, InstanceHistory #, InstanceAction, InstanceHistoryDetail, InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
+from api.instance import InstanceList, Instance, InstanceHistory, InstanceHistoryDetail, InstanceStatusHistoryDetail #, InstanceAction, InstanceTagList, InstanceTagDetail
 from api.instance import InstanceList, Instance
 # from api.machine import MachineList, Machine, MachineHistory, MachineSearch, MachineVote, MachineIcon
 from api.machine_request import MachineRequestList, MachineRequest, MachineRequestStaffList, MachineRequestStaff
@@ -120,7 +120,6 @@ private_apis = patterns('',
     # url(identity_specific + r'/members$', IdentityMembershipList.as_view(), name='identity-membership-list'),
     # url(identity_specific + r'/members/(?P<group_name>(%s)$' % user_match, IdentityMembership.as_view(), name='identity-membership-detail'),
 )
-
 public_apis = format_suffix_patterns(patterns(
     '',
     url(r'^profile$', Profile.as_view(), name='profile'),
@@ -144,13 +143,8 @@ public_apis = format_suffix_patterns(patterns(
 
 
     url(r'^instance_history$', InstanceHistory.as_view(), name='instance-history'),
-    # url(r'^instance_history/'
-    #     '(?P<instance_id>[a-zA-Z0-9-]+)$', InstanceHistoryDetail.as_view(),
-    #     name='instance-history'),
-    # url(r'^instance_history/'
-    #     '(?P<instance_id>[a-zA-Z0-9-]+)/'
-    #     'status_history$', InstanceStatusHistoryDetail.as_view(),
-    #     name='instance-history'),
+    url(r'^instance_history/' + '(?P<instance_id>[a-zA-Z0-9-]+)$', InstanceHistoryDetail.as_view(), name='instance-history'),
+    url(r'^instance_history/' + '(?P<instance_id>[a-zA-Z0-9-]+)/' + 'status_history$', InstanceStatusHistoryDetail.as_view(), name='instance-history'),
 
 
     # url(identity_specific + r'/instance/' + '(?P<instance_id>[a-za-z0-9-]+)/tag$', InstanceTagList.as_view(), name='instance-tag-list'),
@@ -204,6 +198,7 @@ public_apis = format_suffix_patterns(patterns(
     url(r'^maintenance$', MaintenanceRecordList.as_view(), name='maintenance-record-list'),
 
 ))
+
 
 urlpatterns = patterns('',
         url(r'^', include(private_apis,namespace="private_apis")))
