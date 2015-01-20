@@ -2,6 +2,7 @@ from core.models import Application
 from rest_framework import serializers
 from .get_context_user import get_context_user
 
+
 class ApplicationSerializer(serializers.ModelSerializer):
     """
     test maybe something
