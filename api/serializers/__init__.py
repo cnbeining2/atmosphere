@@ -33,3 +33,4 @@ from .TagRelatedField import TagRelatedField
 # from .ApplicationBookmarkSerializer import ApplicationBookmarkSerializer
 # from .AccountSerializer import AccountSerializer
 # from .InstanceRelatedField import InstanceRelatedField
+# from .IdentityRelatedField import IdentityRelatedField
