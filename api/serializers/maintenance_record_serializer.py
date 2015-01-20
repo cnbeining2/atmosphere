@@ -3,7 +3,7 @@ from core.models import MaintenanceRecord
 
 
 class MaintenanceRecordSerializer(serializers.ModelSerializer):
-    provider_id = serializers.Field(source='provider.id')
+    provider_id = serializers.ReadOnlyField(source='provider.id')
 
     class Meta:
         model = MaintenanceRecord
