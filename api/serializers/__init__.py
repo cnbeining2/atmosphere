@@ -26,3 +26,4 @@ from .TagRelatedField import TagRelatedField
 # from .MachineRequestSerializer import MachineRequestSerializer
 # from .MachineExportSerializer import MachineExportSerializer
 # from .PaginatedInstanceSerializer import PaginatedInstanceSerializer
+# from .PaginatedInstanceHistorySerializer import PaginatedInstanceHistorySerializer

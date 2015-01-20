@@ -254,11 +254,3 @@
 #         model = Instance
 #         exclude = ('id', 'provider_machine', 'provider_alias',
 #                    'shell', 'vnc', 'created_by_identity')
-
-
-# class PaginatedInstanceHistorySerializer(pagination.PaginationSerializer):
-#     """
-#     Serializes page objects of Instance querysets.
-#     """
-#     class Meta:
-#         object_serializer_class = InstanceHistorySerializer
