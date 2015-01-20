@@ -14,7 +14,7 @@ from api.email import Feedback, QuotaEmail, SupportEmail
 # from api.group import GroupList, Group
 # from api.identity_membership import IdentityMembershipList, IdentityMembership
 from api.identity import IdentityList, Identity, IdentityDetail, IdentityDetailList
-# from api.instance import InstanceList, Instance, InstanceAction, InstanceHistory, InstanceHistoryDetail, InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
+from api.instance import InstanceList, Instance, InstanceHistory #, InstanceAction, InstanceHistoryDetail, InstanceStatusHistoryDetail, InstanceTagList, InstanceTagDetail
 from api.instance import InstanceList, Instance
 # from api.machine import MachineList, Machine, MachineHistory, MachineSearch, MachineVote, MachineIcon
 from api.machine_request import MachineRequestList, MachineRequest, MachineRequestStaffList, MachineRequestStaff
@@ -143,7 +143,7 @@ public_apis = format_suffix_patterns(patterns(
     url(r'^application/(?P<app_uuid>[a-zA-Z0-9-]+)$', Application.as_view(), name='application-detail'),
 
 
-    # url(r'^instance_history$', InstanceHistory.as_view(), name='instance-history'),
+    url(r'^instance_history$', InstanceHistory.as_view(), name='instance-history'),
     # url(r'^instance_history/'
     #     '(?P<instance_id>[a-zA-Z0-9-]+)$', InstanceHistoryDetail.as_view(),
     #     name='instance-history'),
