@@ -29,3 +29,4 @@ from .TagRelatedField import TagRelatedField
 # from .PaginatedInstanceHistorySerializer import PaginatedInstanceHistorySerializer
 # from .InstanceHistorySerializer import InstanceHistorySerializer
 # from .CredentialSerializer import CredentialSerializer
+# from .ApplicationScoreSerializer import ApplicationScoreSerializer
