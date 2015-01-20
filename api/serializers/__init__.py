@@ -17,3 +17,4 @@ from .TagRelatedField import TagRelatedField
 # from .StepSerializer import StepSerializer
 # from .ProviderSizeSerializer import ProviderSizeSerializer
 # from .NoProjectSerializer import NoProjectSerializer
+# from .VolumeSerializer import VolumeSerializer
