@@ -57,32 +57,3 @@
 #         machine_request.new_machine_memory_min = memory
 #         machine_request.new_machine_storage_min = disk
 #         into[field_name] = value
-
-
-# class AppBookmarkField(serializers.WritableField):
-#
-#     def to_native(self, bookmark_mgr):
-#         request_user = self.root.request_user
-#         if type(request_user) == AnonymousUser:
-#             return False
-#         try:
-#             bookmark_mgr.get(user=request_user)
-#             return True
-#         except ApplicationBookmark.DoesNotExist:
-#             return False
-#
-#     def field_from_native(self, data, files, field_name, into):
-#         value = data.get(field_name)
-#         if value is None:
-#             return
-#         app = self.root.object
-#         user = self.root.request_user
-#         if value:
-#             ApplicationBookmark.objects.\
-#                 get_or_create(application=app, user=user)
-#             result = True
-#         else:
-#             ApplicationBookmark.objects\
-#                                .filter(application=app, user=user).delete()
-#             result = False
-#         into[field_name] = result
