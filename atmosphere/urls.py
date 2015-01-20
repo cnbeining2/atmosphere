@@ -114,6 +114,7 @@ urlpatterns = patterns(
     #API Layer
     url(r'^api/v1/', include("api.urls", namespace="api")),
     # url(r'^api/v1/', include(router.urls)),
+    url(r'^api/v2/', include("api.v2.urls", namespace="api_v2")),
 
     #API Documentation
     url(r'^api-auth/',
