@@ -8,3 +8,4 @@ from .volume_summary_serializer import VolumeSummarySerializer
 from .image_serializer import ImageSerializer
 from .provider_serializer import ProviderSerializer
 from .identity_serializer import IdentitySerializer
+from .quota_serializer import QuotaSerializer
