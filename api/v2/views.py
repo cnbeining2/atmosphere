@@ -1,8 +1,8 @@
 from rest_framework import viewsets
-from core.models import Tag, Project, Application as Image, Provider
+from core.models import Tag, Project, Application as Image, Provider, Identity
 from core.models.user import AtmosphereUser
-from .serializers import TagSerializer, UserSerializer, ProjectSerializer, ImageSerializer, ProviderSerializer
-
+from .serializers import TagSerializer, UserSerializer, ProjectSerializer, ImageSerializer, ProviderSerializer, \
+    IdentitySerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -45,3 +45,13 @@ class ProviderViewSet(viewsets.ModelViewSet):
     """
     queryset = Provider.objects.all()
     serializer_class = ProviderSerializer
+
+
+class IdentityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows providers to be viewed or edited.
+    """
+    queryset = Identity.objects.all()
+    serializer_class = IdentitySerializer
+
+
