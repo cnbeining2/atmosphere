@@ -1,8 +1,8 @@
 from rest_framework import viewsets
-from core.models import Tag, Project, Application as Image, Provider, Identity, Quota
+from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation
 from core.models.user import AtmosphereUser
 from .serializers import TagSerializer, UserSerializer, ProjectSerializer, ImageSerializer, ProviderSerializer, \
-    IdentitySerializer, QuotaSerializer
+    IdentitySerializer, QuotaSerializer, AllocationSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -62,3 +62,10 @@ class QuotaViewSet(viewsets.ModelViewSet):
     queryset = Quota.objects.all()
     serializer_class = QuotaSerializer
 
+
+class AllocationViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows providers to be viewed or edited.
+    """
+    queryset = Allocation.objects.all()
+    serializer_class = AllocationSerializer
