@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from core.models import Tag
+from core.models import Tag, Project
 from core.models.user import AtmosphereUser
-from .serializers import TagSerializer, UserSerializer
+from .serializers import TagSerializer, UserSerializer, ProjectSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -18,3 +18,11 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = AtmosphereUser.objects.all()
     serializer_class = UserSerializer
+
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows tags to be viewed or edited.
+    """
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
