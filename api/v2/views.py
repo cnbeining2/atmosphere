@@ -3,7 +3,7 @@ from core.models import Tag, Project, Application as Image, Provider, Identity, 
 from core.models.user import AtmosphereUser
 from .serializers import TagSerializer, UserSerializer, ProjectSerializer, ImageSerializer, ProviderSerializer, \
     IdentitySerializer, QuotaSerializer, AllocationSerializer, VolumeSerializer
-
+import django_filters
 
 class TagViewSet(viewsets.ModelViewSet):
     """
@@ -71,10 +71,19 @@ class AllocationViewSet(viewsets.ModelViewSet):
     serializer_class = AllocationSerializer
 
 
+class VolumeFilter(django_filters.FilterSet):
+    min_size = django_filters.NumberFilter(name="size", lookup_type='gte')
+    max_size = django_filters.NumberFilter(name="size", lookup_type='lte')
+
+    class Meta:
+        model = Volume
+        fields = ['provider__id', 'min_size', 'max_size']
+
+
 class VolumeViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows providers to be viewed or edited.
     """
     queryset = Volume.objects.all()
     serializer_class = VolumeSerializer
-    filter_fields = ('provider__id',)
+    filter_class = VolumeFilter
