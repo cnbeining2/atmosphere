@@ -375,7 +375,8 @@ REST_FRAMEWORK = {
     ),
     'PAGINATE_BY': 20,                 # Default to 20
     'PAGINATE_BY_PARAM': 'page_size',  # Allow client to override, using `?page_size=xxx`.
-    'MAX_PAGINATE_BY': 100             # Maximum limit allowed when using `?page_size=xxx`.
+    'MAX_PAGINATE_BY': 100,             # Maximum limit allowed when using `?page_size=xxx`.
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend', 'rest_framework.filters.SearchFilter')
 }
 LOGIN_REDIRECT_URL="/api/v1"
 

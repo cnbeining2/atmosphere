@@ -5,3 +5,4 @@ from .instance_serializer import InstanceSerializer
 from .instance_summary_serializer import InstanceSummarySerializer
 from .volume_serializer import VolumeSerializer
 from .volume_summary_serializer import VolumeSummarySerializer
+from .image_serializer import ImageSerializer
