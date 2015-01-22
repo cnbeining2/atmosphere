@@ -35,5 +35,5 @@ class ImageViewSet(viewsets.ModelViewSet):
     """
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
-    # filter_fields = ('name',)
+    filter_fields = ('created_by__username', 'tags__name')
     search_fields = ('name', 'description')
