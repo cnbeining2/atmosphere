@@ -12,6 +12,7 @@ router.register(r'identities', views.IdentityViewSet)
 router.register(r'quotas', views.QuotaViewSet)
 router.register(r'allocations', views.AllocationViewSet)
 router.register(r'volumes', views.VolumeViewSet)
+router.register(r'instances', views.InstanceViewSet)
 
 urlpatterns = patterns('',
                        url(r'^', include(router.urls)),

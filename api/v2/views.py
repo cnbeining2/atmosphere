@@ -1,9 +1,10 @@
+import django_filters
 from rest_framework import viewsets
-from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation, Volume
+from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation, Volume, Instance
 from core.models.user import AtmosphereUser
 from .serializers import TagSerializer, UserSerializer, ProjectSerializer, ImageSerializer, ProviderSerializer, \
-    IdentitySerializer, QuotaSerializer, AllocationSerializer, VolumeSerializer
-import django_filters
+    IdentitySerializer, QuotaSerializer, AllocationSerializer, VolumeSerializer, InstanceSerializer
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """
@@ -19,6 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = AtmosphereUser.objects.all()
     serializer_class = UserSerializer
+    filter_fields = ('email',)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -87,3 +89,12 @@ class VolumeViewSet(viewsets.ModelViewSet):
     queryset = Volume.objects.all()
     serializer_class = VolumeSerializer
     filter_class = VolumeFilter
+
+
+class InstanceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows providers to be viewed or edited.
+    """
+    queryset = Instance.objects.all()
+    serializer_class = InstanceSerializer
+    filter_fields = ('created_by__id',)
