@@ -1,8 +1,8 @@
 from rest_framework import viewsets
-from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation
+from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation, Volume
 from core.models.user import AtmosphereUser
 from .serializers import TagSerializer, UserSerializer, ProjectSerializer, ImageSerializer, ProviderSerializer, \
-    IdentitySerializer, QuotaSerializer, AllocationSerializer
+    IdentitySerializer, QuotaSerializer, AllocationSerializer, VolumeSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -69,3 +69,12 @@ class AllocationViewSet(viewsets.ModelViewSet):
     """
     queryset = Allocation.objects.all()
     serializer_class = AllocationSerializer
+
+
+class VolumeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows providers to be viewed or edited.
+    """
+    queryset = Volume.objects.all()
+    serializer_class = VolumeSerializer
+    filter_fields = ('provider__id',)
