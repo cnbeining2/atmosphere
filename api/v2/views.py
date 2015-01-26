@@ -1,5 +1,7 @@
 import django_filters
 from rest_framework import viewsets
+from rest_framework.decorators import list_route, detail_route
+from rest_framework.response import Response
 from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation, Volume, \
     Instance, InstanceAction, VolumeAction
 from core.models.user import AtmosphereUser
@@ -31,6 +33,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+    @detail_route()
+    def instances(self, *args, **kwargs):
+        project = self.get_object()
+        self.queryset = project.instances.get_queryset()
+        self.serializer_class = InstanceSerializer
+        return self.list(self, *args, **kwargs)
+
+    @detail_route()
+    def volumes(self, *args, **kwargs):
+        project = self.get_object()
+        self.queryset = project.volumes.get_queryset()
+        self.serializer_class = VolumeSerializer
+        return self.list(self, *args, **kwargs)
 
 
 class ImageViewSet(viewsets.ModelViewSet):
