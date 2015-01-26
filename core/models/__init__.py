@@ -23,6 +23,7 @@ from core.models.allocation import Allocation
 from core.models.step import Step
 from core.models.application import Application, ApplicationMembership, ApplicationScore, ApplicationBookmark
 from core.models.instance_action import InstanceAction
+from core.models.volume_action import VolumeAction
 
 
 def get_or_create(Model, *args, **kwargs):
