@@ -18,12 +18,12 @@ from core.models.t import T
 from core.models.tag import Tag
 from core.models.user import AtmosphereUser
 from core.models.volume import Volume
-from core.models.group import Group, ProviderMembership, IdentityMembership,\
-    InstanceMembership
+from core.models.group import Group, ProviderMembership, IdentityMembership, InstanceMembership
 from core.models.allocation import Allocation
 from core.models.step import Step
-from core.models.application import Application, ApplicationMembership,\
-    ApplicationScore, ApplicationBookmark
+from core.models.application import Application, ApplicationMembership, ApplicationScore, ApplicationBookmark
+from core.models.instance_action import InstanceAction
+
 
 def get_or_create(Model, *args, **kwargs):
     return Model.objects.get_or_create(*args, **kwargs)[0]

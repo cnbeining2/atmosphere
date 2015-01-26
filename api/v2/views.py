@@ -1,9 +1,11 @@
 import django_filters
 from rest_framework import viewsets
-from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation, Volume, Instance
+from core.models import Tag, Project, Application as Image, Provider, Identity, Quota, Allocation, Volume, \
+    Instance, InstanceAction
 from core.models.user import AtmosphereUser
 from .serializers import TagSerializer, UserSerializer, ProjectSerializer, ImageSerializer, ProviderSerializer, \
-    IdentitySerializer, QuotaSerializer, AllocationSerializer, VolumeSerializer, InstanceSerializer
+    IdentitySerializer, QuotaSerializer, AllocationSerializer, VolumeSerializer, InstanceSerializer, \
+    InstanceActionSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -98,3 +100,11 @@ class InstanceViewSet(viewsets.ModelViewSet):
     queryset = Instance.objects.all()
     serializer_class = InstanceSerializer
     filter_fields = ('created_by__id',)
+
+
+class InstanceActionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows instance actions to be viewed or edited.
+    """
+    queryset = InstanceAction.objects.all()
+    serializer_class = InstanceActionSerializer

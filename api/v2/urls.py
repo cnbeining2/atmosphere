@@ -13,6 +13,7 @@ router.register(r'quotas', views.QuotaViewSet)
 router.register(r'allocations', views.AllocationViewSet)
 router.register(r'volumes', views.VolumeViewSet)
 router.register(r'instances', views.InstanceViewSet)
+router.register(r'instance_actions', views.InstanceActionViewSet)
 
 urlpatterns = patterns('',
                        url(r'^', include(router.urls)),

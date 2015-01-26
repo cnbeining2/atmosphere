@@ -8,23 +8,18 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'MachineRequest.new_machine_memory_min'
-        db.add_column('machine_request', 'new_machine_memory_min',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'MachineRequest.new_machine_storage_min'
-        db.add_column('machine_request', 'new_machine_storage_min',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
+        # Adding model 'InstanceAction'
+        db.create_table('instance_action', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+        ))
+        db.send_create_signal('core', ['InstanceAction'])
 
 
     def backwards(self, orm):
-        # Deleting field 'MachineRequest.new_machine_memory_min'
-        db.delete_column('machine_request', 'new_machine_memory_min')
-
-        # Deleting field 'MachineRequest.new_machine_storage_min'
-        db.delete_column('machine_request', 'new_machine_storage_min')
+        # Deleting model 'InstanceAction'
+        db.delete_table('instance_action')
 
 
     models = {
@@ -187,6 +182,12 @@ class Migration(SchemaMigration):
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['core.Tag']", 'symmetrical': 'False', 'blank': 'True'}),
             'token': ('django.db.models.fields.CharField', [], {'max_length': '36', 'null': 'True', 'blank': 'True'}),
             'vnc': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'core.instanceaction': {
+            'Meta': {'object_name': 'InstanceAction', 'db_table': "'instance_action'"},
+            'description': ('django.db.models.fields.TextField', [], {}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'core.instancemembership': {
             'Meta': {'unique_together': "(('instance', 'owner'),)", 'object_name': 'InstanceMembership', 'db_table': "'instance_membership'"},
